@@ -30,7 +30,7 @@
 
 #include "irclib.h"
 #include "dns.h"
-ID("$Id: dns.c,v 1.8 2001/10/25 04:59:01 mysidia Exp $");
+ID("$Id: dns.c,v 1.9 2001/10/31 01:02:26 mysidia Exp $");
 
 static adns_state dns_state;
 static LIST_HEAD(, _dnsquery) queries;
@@ -210,3 +210,4 @@ static void check_dns()
 		}
 	}
 }
+
