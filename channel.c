@@ -23,6 +23,7 @@
  *  covered by the GNU General Public License.
  *
  */
+
 /**
  * @file channel.c
  * @brief Channel Routines
