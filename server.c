@@ -39,3 +39,11 @@
  * high-level things like dealing with messages once they are handled
  * though possibly using utilities in the library itself to do that.
  */
+
+/* --> server socket */
+
+/* --> local clients */
+
+/* --> networking servers */
+
+/* --> remote servers */

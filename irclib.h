@@ -88,11 +88,13 @@
 #include <sys/socket.h>
 #endif
 
-#ifdef HAVE_SYS_QUEUE_H
+/*#ifdef HAVE_SYS_QUEUE_H
 #include <sys/queue.h>
 #elif defined(HAVE_QUEUE_H)
 #include <queue.h>
-#endif
+#endif*/
+
+#include "queue.h"
 
 #include <netinet/in.h>
 #include <arpa/inet.h>
