@@ -134,6 +134,8 @@ struct _ircbf
 typedef struct _ircbf IrcBuf;
 typedef struct _ircbf IrcLibSocketBuf;
 
+#define PRIV_MEM(type, var, ne) \
+		type _##__LINE__##_var__ [ne]
 
 /**
  * An IRC Connection endpoint
@@ -151,14 +153,14 @@ struct _ircsocket
 	IrcLibSocketBuf inBuf;
 	IrcLibSocketBuf outBuf;
 #else
-	char __fd__[INTBITS];
-	char __flags__[INTBITS];
-	char __event__[sizeof(struct event *)];
-	char __tv__[sizeof(struct timeval)];
-	char __addr__[sizeof(struct in_addr)];
-	char __tailBuf__[sizeof(char *)];
-	char __inbuf__[sizeof(IrcLibSocketBuf)];
-	char __outbuf__[sizeof(IrcLibSocketBuf)];
+	PRIV_MEM(int,	fd,	1);
+	PRIV_MEM(int,	flags,	1);
+	PRIV_MEM(struct event*, theEvent, 1);
+	PRIV_MEM(struct timeval tv, 1);
+	PRIV_MEM(struct in_addr addr, 1);
+	PRIV_MEM(char*, tailBuf, 1);
+	PRIV_MEM(IrcLibSocketBuf, __inbuf__, 1);
+	PRIV_MEM(IrcLibSocketBuf, __outbuf__, 1);
 #endif
 
 	time_t lasttime;
@@ -192,6 +194,15 @@ struct _irccon
 {
 };
 
+struct IRC(_Message)
+{
+	int numarg;
+	char *prefix;
+	char *command;
+	char *args;
+};
+typedef struct IRC(_Message) IRC(Message);
+
 int IRC(SockNonBlock) (int listenDesc);
 IRC(Socket) *IRC(socket_make)();
 int IRC(socket_bind)(IRC(Socket) *theSocket, int portNum, struct in_addr addr);
@@ -219,6 +230,8 @@ void IRC(socket_connect)
 	(IRC(Socket)*, int port, struct in_addr, int (*)(IRC(Socket) *, int));
 
 int IRC(match)(const char *mask, const char *string);
+
+void IRC(MakeMessage)(IRC(Message)*, char*);
 
 extern time_t CTime;
 
@@ -255,4 +268,3 @@ struct IRC(_session)
 };
 typedef struct IRC(_session) IRC(Ses);
 typedef struct IRC(_session) IRC(Session);
-
