@@ -85,21 +85,9 @@ void IRC(ChanPart) (IRC(Ses)so, IRC(ChannelName) *chan_name)
 	IrcSend(so.sock, "PART %s" IEOL, IRC(ChanCgetName)(chan_name));
 }
 
-//void IRC(ChanAddUser) ( )
+//void IRC(ChanAddUser) ( IRC(Channel)* cl, IRC(User)* us )
 //{
 //}
-
-void IRC(SendModeChange) (
-			  IRC(Ses) so, 
-			  IRC(ChannelName) *chan_name,
-			  IRC(ChannelMode) orig,
-                          IRC(ChannelMode) newmode
-)
-{
-	// Calculate difference and send change
-
-	// IrcSend("MODE %s buf" IEOL, IRC(ChanCgetName)(chan_name));
-}
 
 //void IRC(SendAddBan) (IRC(ChannelName) *chan_name, IRC(ChannelBan) *bNew)
 //void IRC(SendDelBan) (IRC(ChannelName) *chan_name, IRC(ChannelBan) *bOld)
@@ -259,6 +247,57 @@ void IrcDelChannel ( ilHashTable **chanHash, IrcChannel *cl )
 
 	if ( z == 0 )
 		abort();
+}
+
+void IRC(SendModeChange) (
+			  IRC(Ses) so, 
+			  IRC(ChannelName) *chan_name,
+			  IRC(ChannelMode) orig,
+                          IRC(ChannelMode) newmode
+)
+{
+	char buf[512], tmp[2];
+	int i, a, b, pm=0;
+
+	buf[0] = '\0';
+	tmp[1] = '\0';
+
+	// Calculate difference and send change
+
+	for(i = 0; i < (sizeof IrcModeBitMap) / (sizeof *IrcModeBitMap); i++)
+	{
+		if (IrcModeBitMap[i].mask1) {
+			a = (orig.mode[0] & IrcModeBitMap[i].mask1) ? 1 : 0;
+			b = (newmode.mode[0] & IrcModeBitMap[i].mask1) ? 1 : 0;
+		}
+		else {
+			a = (orig.mode[1] & IrcModeBitMap[i].mask2) ? 1 : 0;
+			b = (newmode.mode[1] & IrcModeBitMap[i].mask2) ? 1 : 0;
+		}
+
+		
+		tmp[1] = IrcModeBitMap[i].fl;
+
+		if (a && !b) {
+			if (pm >= 0) {
+				strcat(buf, "-");
+				pm = -1;
+			}
+			strcat(buf, tmp);
+		}
+
+		if (!a && b) {
+			if (pm <= 0) {
+				strcat(buf, "+");
+				pm = 1;
+			}
+			strcat(buf, tmp);
+		}
+	}
+
+	// IrcModeBitMap[].mask1  mask2   fl(letter)
+	IrcSend("MODE %s %s" IEOL, IRC(ChanCgetName)(chan_name),
+		buf);
 }
 
 /********************************************************************/

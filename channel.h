@@ -34,6 +34,7 @@
 struct _irc_hash_table;
 
 struct _chan_mode_par {
+	char fl;
 	char *value;
 };
 typedef struct _chan_mode_par IrcChannelModePar;
@@ -64,6 +65,11 @@ struct _chanhandle
 	IrcChannelMode		mode;
 };
 typedef struct _chanhandle IrcChannel;
+
+struct _chanuser
+{
+//	IRC(NickName)		nick;
+};
 
 void IrcAddChannel ( struct _irc_hash_table**, IrcChannel *cl );
 IrcChannel *IrcFindChannel ( struct _irc_hash_table**, IRC(ChannelName) *cn );
