@@ -31,7 +31,7 @@
 #include "irclib.h"
 #include <stddef.h>
 
-ID("$Id: sock.c,v 1.29 2001/11/17 04:23:53 mysidia Exp $");
+ID("$Id: sock.c,v 1.30 2001/11/17 04:41:55 mysidia Exp $");
 
 void IrcLibEventSocket(int fd, short evType, void *p);
 void IrcLibEventListener(int fd, short evType, void *p);
@@ -238,7 +238,7 @@ IrcLibReadPackets(IrcSocket *ptrLink)
 			goto tailbuf;
 	}
 
-	k = read(ptrLink->fd, sockbuf, 8192);
+	k = read(ptrLink->fd, sockbuf, sizeof(sockbuf));
 
 	while(k > 0)
 	{
@@ -257,14 +257,14 @@ IrcLibReadPackets(IrcSocket *ptrLink)
 			if (len >= SOCKBUFSIZE)
 				return -1;
 
-			k = read(ptrLink->fd, sockbuf + len, 8192 - len);
+			k = read(ptrLink->fd, sockbuf + len, sizeof(sockbuf) - len);
 			if (k > 0) {
 				k += len;
 				b = NULL;
 			}
 		}
 		else {
-			k = read(ptrLink->fd, sockbuf, 8192);
+			k = read(ptrLink->fd, sockbuf, sizeof(sockbuf));
 		}
 	}
 
@@ -381,8 +381,10 @@ IrcSend(IrcSocket *s, const char *fmt, ...)
 
 
 	va_start(ap, fmt);
-	vsnprintf(buf, sizeof(buf), fmt, ap);
+	vsnprintf(buf, sizeof(buf) - 3, fmt, ap);
 	va_end(ap);
+
+	strcat(buf, "\r\n");
 
 	IRC(BufShove)(&s->outBuf, buf, strlen(buf));
 }
