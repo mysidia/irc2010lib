@@ -1,7 +1,9 @@
 #include "irclib.h"
 #include "dns.h"
 #include <assert.h>
-ID("$Id: stest.c,v 1.9 2001/10/25 05:01:03 mysidia Exp $");
+ID("$Id: stest.c,v 1.10 2001/10/25 20:18:09 mysidia Exp $");
+
+IRC(Socket) *testCli;
 
 int Test(IrcSocket *cl)
 {
@@ -29,6 +31,14 @@ int funFin ( IRC(dns_query)*q, char *r, void *d )
 }
 
 
+int conDone( IRC(Socket) * sock, int errcode )
+{
+	if (errcode)
+		printf("Connection %d\n", errcode);
+	else
+		printf("Connection with %X established\n", sock->addr.s_addr);
+}
+
 int main()
 {
 	IRC(Socket) *p;
@@ -37,13 +47,16 @@ int main()
 
 	LibIrcInit();
 	p = IRC(socket_make)();
+	testCli = IRC(socket_make)();
 
-	if (p == NULL)
+	if (p == NULL || testCli == NULL)
 		abort();
 
 	addr.s_addr = INADDR_ANY;
 
 	if (IRC(socket_bind)(p, 3030, addr) < 0)
+		abort();
+	if (IRC(socket_bind)(testCli, 0, addr) < 0)
 		abort();
 	if ((q = IRC(MakeListener)(p)) == NULL)
 		abort();
@@ -53,7 +66,11 @@ int main()
 
 	q->sock->periodic = Test;
 
-	query_dns(0, "localhost", funFin, NULL);	
+	query_dns(0, "localhost", funFin, NULL);
+
+	addr.s_addr = inet_addr("127.0.0.1");
+	IRC(socket_connect)(testCli, 3030, addr, conDone);
+
 	IRC(SystemLoop)();
 
 //	sleep (6000);

@@ -113,7 +113,11 @@ void *oalloc(size_t);
 #define USERLEN		8
 
 
-#define IRCSOCK_WRITE	0x1
+#define IRCSOCK_BOUND	0x1
+#define IRCSOCK_LISTEN	0x2
+#define IRCSOCK_INCONN	0x4
+#define IRCSOCK_ESTAB	0x8
+#define IRCSOCK_WRITE	0x10
 
 struct _ircbf
 {
@@ -151,6 +155,7 @@ struct _ircsocket
 	struct _irclistener *port;
 	int (* func)(struct _ircsocket*, char *);
 	int (* periodic)(struct _ircsocket*);
+	int (* conn)(struct _ircsocket*, int);
 
 	LIST_ENTRY(_ircsocket)	socket_list;
 };
@@ -193,9 +198,13 @@ void IrcSend(IRC(Socket) *, const char *, ...);
 int IrcLibDefaultSockHandler(IRC(Socket) *, char *);
 int IrcLibDefaultListenHandler(IRC(Socket) *, char *);
 int IrcLibDefaultClientHandler(IRC(Socket) *, char *);
-extern time_t CTime;
+
+void IRC(socket_connect)
+	(IRC(Socket)*, int port, struct in_addr, int (*)(IRC(Socket) *, int));
 
 int IRC(match)(const char *mask, const char *string);
+
+extern time_t CTime;
 
 #define IrcLibPop	IrcLib_pop
 #define IrcListener	IRC(Listener)

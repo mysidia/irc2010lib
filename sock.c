@@ -31,7 +31,7 @@
 #include "irclib.h"
 #include <stddef.h>
 
-ID("$Id: sock.c,v 1.24 2001/10/25 05:18:10 mysidia Exp $");
+ID("$Id: sock.c,v 1.25 2001/10/25 20:18:09 mysidia Exp $");
 
 void IrcLibEventSocket(int fd, short evType, void *p);
 void IrcLibEventListener(int fd, short evType, void *p);
@@ -130,6 +130,9 @@ int IRC(socket_bind)(IrcSocket *theSocket, int portNum, struct in_addr addr)
 		perror("bind");
 		return -1;
 	}
+
+	theSocket->flags |= IRCSOCK_BOUND;
+
 	return 0;
 }
 
@@ -151,6 +154,7 @@ IrcListener *IRC(MakeListener)(IrcSocket *theSocket)
 
 	port->topFd = theSocket->fd;
 	LIST_INIT(&port->links);
+	port->sock->flags |= IRCSOCK_LISTEN;
 
 	return port;
 }
@@ -167,10 +171,10 @@ void IRC(SocketAddEvents)(IrcSocket *theSocket)
 		event_del(p);
 	}
 
-	event_set(p, theSocket->fd, EV_READ | EV_TIMEOUT, IrcLibEventSocket, theSocket);
-
 	if ((theSocket->flags & IRCSOCK_WRITE) == 0)
 		event_set(p, theSocket->fd, EV_READ | EV_WRITE | EV_TIMEOUT, IrcLibEventSocket, theSocket);
+	else
+		event_set(p, theSocket->fd, EV_READ | EV_TIMEOUT, IrcLibEventSocket, theSocket);
 
 	theSocket->tv.tv_usec = 10000;
 	theSocket->tv.tv_sec = 0;
@@ -307,6 +311,7 @@ IrcLibEventListener(int fd, short evType, void *vI)
 			p->fd = pFd;
 			p->addr = sai.sin_addr;
 			p->port = li;
+			p->flags = IRCSOCK_ESTAB;
 			(* li->sock->func)(p, "");
 //XXX debug
 			printf("Incoming link from %x\n", sai.sin_addr.s_addr);
@@ -317,6 +322,38 @@ IrcLibEventListener(int fd, short evType, void *vI)
 
 	IRC(ListenerAddEvents)(li);
 }
+
+void IRC(socket_connect)
+	(IRC(Socket)*sock, int portNum, struct in_addr addr,
+	int (* finHandler)(IRC(Socket)* sock, int errcode))
+{
+	struct sockaddr_in sai;
+
+	sai.sin_addr = addr;
+	sai.sin_port = htons(portNum);
+	sai.sin_family = AF_INET;
+	sock->addr = addr;
+
+	if ( connect(sock->fd, (struct sockaddr *) &sai, sizeof(struct sockaddr_in)) == 0)
+	{
+		(* finHandler)(sock, 0);
+		return;
+	}
+
+	if (errno != EWOULDBLOCK && errno != EINTR && errno != EINPROGRESS) {
+		(* finHandler)(sock, errno);
+		return;
+	}
+
+	sock->conn = finHandler;
+	sock->flags = IRCSOCK_BOUND | IRCSOCK_INCONN;
+	IRC(SocketAddEvents)(sock);
+}
+
+/*int (* xxdontCallMe ( int ((* x)()) )) {
+      return (int (*)(int ((* x)()))) xxdontCallMe; 
+}*/
+
 
 /**
  * @brief Send a message
@@ -347,8 +384,17 @@ IrcLibEventSocket(int fd, short evType, void *p)
 
 	CTime = time(NULL);
 
-	if (evType & EV_WRITE)
+	if (evType & EV_WRITE) {
+		if (q->flags & IRCSOCK_INCONN) {
+			q->flags &= ~IRCSOCK_INCONN;
+			q->flags |= IRCSOCK_ESTAB;
+
+			if (q->conn) {
+				(* q->conn)(q, 0);
+			}
+		}
 		q->flags |= IRCSOCK_WRITE;
+	}
 
 	if ((evType & EV_READ) != 0) 
 	{
