@@ -5,6 +5,7 @@ struct _chanmode
 	long mode[2];
 };
 typedef struct _chanmode IrcChannelMode;
+typedef struct _chanmode IRC(ChannelMode);
 
 
 struct _channame

@@ -38,7 +38,7 @@ const IRC(ChannelName) IRC(ChanMakeTempName) (const char *name)
 {
 	IRC(ChannelName) tmp;
 
-	tmp.name = name;
+	tmp.name = (char *)name;
 	return tmp;
 }
 
@@ -70,18 +70,22 @@ void IRC(ChanCsetName) (IRC(ChannelName) *cn, const char *str)
 		cn->name = NULL;
 }
 
-void IRC(ChanJoin) (IRC(ChannelName) *chan_name)
+void IRC(ChanJoin) (IRC(Ses)so, IRC(ChannelName) *chan_name)
 {
-	IrcSend("JOIN %s" IEOL, IRC(ChanCgetName)(chan_name));
+	IrcSend(so.sock, "JOIN %s" IEOL, IRC(ChanCgetName)(chan_name));
 }
 
-void IRC(ChanPart) (IRC(ChannelName) *chan_name)
+void IRC(ChanPart) (IRC(Ses)so, IRC(ChannelName) *chan_name)
 {
-	IrcSend("PART %s" IEOL, IRC(ChanCgetName)(chan_name));
+	IrcSend(so.sock, "PART %s" IEOL, IRC(ChanCgetName)(chan_name));
 }
 
-void IRC(SendModeChange) (IRC(ChannelName) *chan_name, ChannelMode orig,
-                          ChannelMode newmode)
+void IRC(SendModeChange) (
+			  IRC(Ses) so, 
+			  IRC(ChannelName) *chan_name,
+			  IRC(ChannelMode) orig,
+                          IRC(ChannelMode) newmode
+)
 {
 	// Calculate difference and send change
 

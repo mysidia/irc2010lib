@@ -233,3 +233,13 @@ extern time_t CTime;
 #	define __RCSID(s) __IDSTRING(rcsid, s)	
 #	define __USEVAR(s) __IDSTRING(s, "(null)")
 #endif
+
+
+
+struct IRC(_session)
+{
+	IRC(Socket) *sock;
+};
+typedef struct IRC(_session) IRC(Ses);
+typedef struct IRC(_session) IRC(Session);
+
