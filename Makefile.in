@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# $Id: Makefile.in,v 1.8 2001/10/27 18:28:17 mysidia Exp $
+# $Id: Makefile.in,v 1.9 2001/10/27 18:57:06 mysidia Exp $
 #
 #
 
@@ -68,6 +68,7 @@ CC = @CC@
 CPP = @CPP@
 DLLTOOL = @DLLTOOL@
 LIBTOOL = @LIBTOOL@
+LIBTOOLIZE = @LIBTOOLIZE@
 LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
 OBJDUMP = @OBJDUMP@
@@ -107,7 +108,7 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
 DIST_COMMON =  README AUTHORS COPYING ChangeLog INSTALL Makefile.am \
 Makefile.in NEWS aclocal.m4 config.guess config.sub configure \
-configure.in install-sh
+configure.in install-sh ltconfig ltmain.sh missing mkinstalldirs
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
