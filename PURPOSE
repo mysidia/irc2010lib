@@ -1,0 +1,5 @@
+The purpose is to develop a generic IRC library for
+clients and servers.
+
+The goal is to eliminate the need for client code to depend
+very heavily on the particular IRC protocol in use.
