@@ -60,9 +60,9 @@ IrcModeBitMap[] =
 	{ '\0' }
 };
 
-ChannelMode IrcLibFlagToMode(char flag)
+IrcChannelMode IrcLibFlagToMode(char flag)
 {
-	ChannelMode mode;
+	IrcChannelMode mode;
 
 	if (isalpha(flag)) 
 	{
@@ -88,10 +88,12 @@ ChannelMode IrcLibFlagToMode(char flag)
 	return mode;
 }
 
-void IrcLibModeSetMode(ChannelMode *q, const char *flagsToSet)
+void IrcLibModeSetMode(IrcChannelMode *q, const char *flagsToSet,
+	const char *para[], int paraArgc,
+	int (* paramHandler)(char mode, const char *))
 {
-	int what = 1;
-	ChannelMode v;
+	int what = 1, onarg = 0;
+	IrcChannelMode v;
 
 	while(flagsToSet && *flagsToSet) {
 		switch(*flagsToSet)
@@ -99,6 +101,10 @@ void IrcLibModeSetMode(ChannelMode *q, const char *flagsToSet)
 		case '-': what = 0; break;
 		case '+': what = 1; break;
 
+		case 'o':
+			if (paraArgc-- > 0)
+				paramHandler(*flagsToSet, para[onarg++]);
+			break;
 		default:
 			v = IrcLibFlagToMode(*flagsToSet);
 			if (what) {
