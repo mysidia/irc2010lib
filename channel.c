@@ -34,6 +34,31 @@ char * IRC(ChanCgetName) (IRC(ChannelName) *cn)
 	return ( cn )->name;
 }
 
+const IRC(ChannelName) IRC(ChanMakeTempName) (const char *name)
+{
+	IRC(ChannelName) tmp;
+
+	tmp.name = name;
+	return tmp;
+}
+
+IRC(ChannelName)* IRC(ChanMakeName) (const char *name)
+{
+	IRC(ChannelName) *tmp;
+
+	tmp = oalloc(sizeof(IRC(ChannelName)));
+	( tmp )->name = str_dup(name);
+
+	return tmp;
+}
+
+void IRC(ChanFreeName) (IRC(ChannelName) *p)
+{
+	if (( p )->name)
+		free(p->name);
+	free(p);
+}
+
 void IRC(ChanCsetName) (IRC(ChannelName) *cn, const char *str)
 {
 	if ( ( cn )->name )
@@ -49,6 +74,29 @@ void IRC(ChanJoin) (IRC(ChannelName) *chan_name)
 {
 	IrcSend("JOIN %s" IEOL, IRC(ChanCgetName)(chan_name));
 }
+
+void IRC(ChanPart) (IRC(ChannelName) *chan_name)
+{
+	IrcSend("PART %s" IEOL, IRC(ChanCgetName)(chan_name));
+}
+
+void IRC(SendModeChange) (IRC(ChannelName) *chan_name, ChannelMode orig,
+                          ChannelMode newmode)
+{
+	// Calculate difference and send change
+
+	// IrcSend("MODE %s buf" IEOL, IRC(ChanCgetName)(chan_name));
+}
+
+//void IRC(SendAddBan) (IRC(ChannelName) *chan_name, IRC(ChannelBan) *bNew)
+//void IRC(SendDelBan) (IRC(ChannelName) *chan_name, IRC(ChannelBan) *bOld)
+
+//void IRC(SendCUserModePlus) (IRC(ChannelName) *chan_name, IRC(ChannelUser) *opNew, IRC(ChannelMode) toAdd)
+//void IRC(SendCUserModeLess) (IRC(ChannelName) *chan_name, IRC(ChannelUser) *opOld, IRC(ChannelMode) toDel)
+
+//void IRC(SendKick) (IRC(ChannelName) *chan_name, IRC(ChannelUser) *target);
+//void IRC(SendInvite) (IRC(ChannelName) *chan_name, IRC(NickName) *target);
+//BanMask* IRC(GetBanMask) (IRC(UserHost) *a) 
 
 /**********************************************************************/
 
