@@ -1,4 +1,4 @@
-/* $Id: hash.h,v 1.6 2002/01/06 08:39:21 mysidia Exp $ */
+/* $Id: hash.h,v 1.7 2002/01/30 02:30:48 mysidia Exp $ */
 
 /*
  *  Hash Table Header
@@ -35,17 +35,22 @@
 struct _irc_hash_entry;
 struct _irc_hash_bucket;
 
+/**
+ * An entry in an [il?] hash table
+ */
 struct _irc_hash_entry
 {
 	void *item;
 	struct _irc_hash_entry *next;
 };
 
+/*! Entire hash bucket */
 struct _irc_hash_bucket
 {
 	struct _irc_hash_entry *first;
 };
 
+/*! Entire hash table */
 struct _irc_hash_table
 {
 	struct _irc_hash_bucket **table;
