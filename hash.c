@@ -56,6 +56,32 @@ ilHashTable *ilNewHashTable(int size, const char* (* get_key)(void*)) {
 }
 
 ilHashTable *ilRehashTable(ilHashTable *ht, int newsize) {
+	struct _irc_hash_table nt;
+	struct _irc_hash_entry *he;
+	int i = 0, size = ht->size;
+
+	if (newsize == 0) {
+		fprintf(stderr, "Rehash to size 0 attempted\n");
+		abort();
+		return NULL;
+	}
+
+	nt.table = oalloc(sizeof(struct _irc_hash_bucket*) * (newsize));
+	nt.size = newsize;
+	nt.get_key = ht->get_key;
+
+	for(i = 0; i < size; i++) {
+		for(he = nt.table[i]->first; he; he = he->next) {
+			ilHashAdd(&nt, he->item);
+		}
+	}
+
+	ilEmptyHashTable(ht);
+	free(ht->table);
+	ht->size = nt.size;
+	ht->table = nt.table;
+
+	return ht;
 }
 
 ilHashTable *ilEmptyHashTable(ilHashTable *ht) {
