@@ -13,7 +13,7 @@
 
 @SET_MAKE@
 
-# $Id: Makefile.in,v 1.13 2001/10/31 01:02:26 mysidia Exp $
+# $Id: Makefile.in,v 1.14 2001/10/31 01:23:19 mysidia Exp $
 #
 #
 
@@ -84,13 +84,13 @@ install_sh = @install_sh@
 
 DEFS = -D_IRCLIB @DEFS@
 
-bin_PROGRAMS = stest
+bin_PROGRAMS = stest ctest
 stest_SOURCES = stest.c
 stest_LDADD = libirc.la -levent -ladns
 
+ctest_SOURCES = ctest.c
+ctest_LDADD = libirc.la -levent -ladns
 
-#ctest_SOURCES = ctest.c
-#ctest_LDADD = libirc.la -levent -ladns
 lib_LTLIBRARIES = libirc.la
 libirc_la_SOURCES = match.c mem.c sock.c server.c irc.c channel.c dns.c
 
@@ -106,9 +106,13 @@ libirc_la_LIBADD =
 am_libirc_la_OBJECTS = match.lo mem.lo sock.lo server.lo irc.lo \
 	channel.lo dns.lo
 libirc_la_OBJECTS = $(am_libirc_la_OBJECTS)
-bin_PROGRAMS = stest$(EXEEXT)
+bin_PROGRAMS = stest$(EXEEXT) ctest$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
 
+am_ctest_OBJECTS = ctest.$(OBJEXT)
+ctest_OBJECTS = $(am_ctest_OBJECTS)
+ctest_DEPENDENCIES = libirc.la
+ctest_LDFLAGS =
 am_stest_OBJECTS = stest.$(OBJEXT)
 stest_OBJECTS = $(am_stest_OBJECTS)
 stest_DEPENDENCIES = libirc.la
@@ -118,10 +122,11 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
-@AMDEP_TRUE@DEP_FILES = $(DEPDIR)/channel.Plo $(DEPDIR)/dns.Plo \
-@AMDEP_TRUE@	$(DEPDIR)/irc.Plo $(DEPDIR)/match.Plo \
-@AMDEP_TRUE@	$(DEPDIR)/mem.Plo $(DEPDIR)/server.Plo \
-@AMDEP_TRUE@	$(DEPDIR)/sock.Plo $(DEPDIR)/stest.Po
+@AMDEP_TRUE@DEP_FILES = $(DEPDIR)/channel.Plo $(DEPDIR)/ctest.Po \
+@AMDEP_TRUE@	$(DEPDIR)/dns.Plo $(DEPDIR)/irc.Plo \
+@AMDEP_TRUE@	$(DEPDIR)/match.Plo $(DEPDIR)/mem.Plo \
+@AMDEP_TRUE@	$(DEPDIR)/server.Plo $(DEPDIR)/sock.Plo \
+@AMDEP_TRUE@	$(DEPDIR)/stest.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -130,12 +135,12 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 CFLAGS = @CFLAGS@
-DIST_SOURCES = $(libirc_la_SOURCES) $(stest_SOURCES)
+DIST_SOURCES = $(libirc_la_SOURCES) $(ctest_SOURCES) $(stest_SOURCES)
 DIST_COMMON = README AUTHORS COPYING ChangeLog INSTALL Makefile.am \
 	Makefile.in NEWS aclocal.m4 config.guess config.sub configure \
 	configure.in depcomp install-sh ltconfig ltmain.sh missing \
 	mkinstalldirs
-SOURCES = $(libirc_la_SOURCES) $(stest_SOURCES)
+SOURCES = $(libirc_la_SOURCES) $(ctest_SOURCES) $(stest_SOURCES)
 
 all: all-am
 
@@ -210,6 +215,9 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
+ctest$(EXEEXT): $(ctest_OBJECTS) $(ctest_DEPENDENCIES) 
+	@rm -f ctest$(EXEEXT)
+	$(LINK) $(ctest_LDFLAGS) $(ctest_OBJECTS) $(ctest_LDADD) $(LIBS)
 stest$(EXEEXT): $(stest_OBJECTS) $(stest_DEPENDENCIES) 
 	@rm -f stest$(EXEEXT)
 	$(LINK) $(stest_LDFLAGS) $(stest_OBJECTS) $(stest_LDADD) $(LIBS)
@@ -221,6 +229,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/channel.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ctest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/dns.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/irc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/match.Plo@am__quote@

@@ -31,7 +31,7 @@
 #include "irclib.h"
 #include <stddef.h>
 
-ID("$Id: sock.c,v 1.25 2001/10/25 20:18:09 mysidia Exp $");
+ID("$Id: sock.c,v 1.26 2001/10/31 01:23:19 mysidia Exp $");
 
 void IrcLibEventSocket(int fd, short evType, void *p);
 void IrcLibEventListener(int fd, short evType, void *p);
@@ -88,7 +88,8 @@ IrcSocket *IRC(socket_make)()
 
 void IrcLibdelCon(IrcSocket *q)
 {
-	LIST_REMOVE(q, socket_list);
+	if ((q->flags & IRCSOCK_INBOUND) != 0)
+		LIST_REMOVE(q, socket_list);
 //	LibIrcSocketDelEvents(q);
 }
 
@@ -311,7 +312,7 @@ IrcLibEventListener(int fd, short evType, void *vI)
 			p->fd = pFd;
 			p->addr = sai.sin_addr;
 			p->port = li;
-			p->flags = IRCSOCK_ESTAB;
+			p->flags = IRCSOCK_ESTAB | IRCSOCK_INBOUND;
 			(* li->sock->func)(p, "");
 //XXX debug
 			printf("Incoming link from %x\n", sai.sin_addr.s_addr);
@@ -336,17 +337,21 @@ void IRC(socket_connect)
 
 	if ( connect(sock->fd, (struct sockaddr *) &sai, sizeof(struct sockaddr_in)) == 0)
 	{
+		sock->conn = finHandler;
+		sock->flags = IRCSOCK_BOUND | IRCSOCK_ESTAB;
+
 		(* finHandler)(sock, 0);
 		return;
 	}
+
+	sock->conn = finHandler;
+	sock->flags = IRCSOCK_BOUND | IRCSOCK_INCONN;
 
 	if (errno != EWOULDBLOCK && errno != EINTR && errno != EINPROGRESS) {
 		(* finHandler)(sock, errno);
 		return;
 	}
 
-	sock->conn = finHandler;
-	sock->flags = IRCSOCK_BOUND | IRCSOCK_INCONN;
 	IRC(SocketAddEvents)(sock);
 }
 
@@ -384,20 +389,23 @@ IrcLibEventSocket(int fd, short evType, void *p)
 
 	CTime = time(NULL);
 
-	if (evType & EV_WRITE) {
-		if (q->flags & IRCSOCK_INCONN) {
-			q->flags &= ~IRCSOCK_INCONN;
-			q->flags |= IRCSOCK_ESTAB;
-
-			if (q->conn) {
-				(* q->conn)(q, 0);
-			}
-		}
-		q->flags |= IRCSOCK_WRITE;
-	}
-
 	if ((evType & EV_READ) != 0) 
 	{
+		if (q->flags & IRCSOCK_INCONN) {
+			struct sockaddr_in sai;
+			socklen_t nl;
+
+			if (getpeername(q->fd, (struct sockaddr *)&sai, &nl) < 0)
+			{
+				if (q->conn)
+					(* q->conn)(q, errno);
+				close(q->fd);
+				IrcLibdelCon(q);
+				IrcFreeSocket(q);
+				return;
+			}
+		}
+
 		if (IrcLibReadPackets(q) < 0)
 		{
 	//XXX debug
@@ -416,6 +424,19 @@ IrcLibEventSocket(int fd, short evType, void *p)
 				return;
 			}
 		}
+	}
+
+
+	if (evType & EV_WRITE) {
+		if (q->flags & IRCSOCK_INCONN) {
+			q->flags &= ~IRCSOCK_INCONN;
+			q->flags |= IRCSOCK_ESTAB;
+
+			if (q->conn) {
+				(* q->conn)(q, 0);
+			}
+		}
+		q->flags |= IRCSOCK_WRITE;
 	}
 
 	if ((evType & EV_TIMEOUT) || (evType & EV_READ)) 

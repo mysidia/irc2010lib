@@ -116,11 +116,12 @@ char *str_dup(const char *);
 #define USERLEN		8
 
 
-#define IRCSOCK_BOUND	0x1
-#define IRCSOCK_LISTEN	0x2
-#define IRCSOCK_INCONN	0x4
-#define IRCSOCK_ESTAB	0x8
-#define IRCSOCK_WRITE	0x10
+#define IRCSOCK_BOUND		0x1
+#define IRCSOCK_LISTEN		0x2
+#define IRCSOCK_INCONN		0x4
+#define IRCSOCK_ESTAB		0x8
+#define IRCSOCK_WRITE		0x10
+#define IRCSOCK_INBOUND		0x20
 
 struct _ircbf
 {
