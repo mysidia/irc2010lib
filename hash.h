@@ -1,4 +1,4 @@
-/* $Id: hash.h,v 1.3 2001/12/30 10:18:06 mysidia Exp $ */
+/* $Id: hash.h,v 1.4 2002/01/06 08:12:31 mysidia Exp $ */
 
 /*
  *  Hash Table Header
@@ -32,29 +32,35 @@
 
 #include <stddef.h>
 
-struct _hash_entry;
-struct _hash_bucket;
+struct _irc_hash_entry;
+struct _irc_hash_bucket;
 
-struct _hash_entry
+struct _irc_hash_entry
 {
-        void *item;
-        struct _hash_bucket *next;
+	void *item;
+	struct _irc_hash_entry *next;
 };
 
-struct _hash_table
+struct _irc_hash_bucket
 {
-	struct _hash_entry **table;
+	struct _irc_hash_entry *first;
+};
+
+struct _irc_hash_table
+{
+	struct _irc_hash_bucket **table;
+	const char (* get_key)(void *item);
 	int size;
 };
 
-typedef struct _hash_table ilHashTable;
+typedef struct _irc_hash_table ilHashTable;
 
 
-ilHashTable *ilNewHashTable(int size);
+ilHashTable *ilNewHashTable(int size, const char (* getKeyPred)(void*));
 ilHashTable *ilRehashTable(ilHashTable *, int newsize);
 ilHashTable *ilEmptyHashTable(ilHashTable *);
 ilHashTable *ilFreeHashTable(ilHashTable *);
 
 void *ilHashFind(ilHashTable*, char *);
-void *ilHashDel(ilHashTable*, char *, void *);
-void *ilHashAdd(ilHashTable*, char *, void*);
+void *ilHashDel(ilHashTable*, void *);
+void *ilHashAdd(ilHashTable*, void*);

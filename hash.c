@@ -31,12 +31,6 @@
 #include "irclib.h"
 #include "hash.h"
 
-struct _hash_bucket
-{
-	struct _hash_entry *first;
-};
-
-
 u_int32_t
 IRCHashKey(char *datum)
 {
@@ -50,13 +44,37 @@ IRCHashKey(char *datum)
 
 
 
-ilHashTable *ilNewHashTable(int size) {return 0;}
-ilHashTable *ilRehashTable(ilHashTable *ht, int newsize) {return 0;}
-ilHashTable *ilEmptyHashTable(ilHashTable *ht) {return 0;}
-ilHashTable *ilFreeHashTable(ilHashTable *ht) {return 0;}
+ilHashTable *ilNewHashTable(int size, const char (* get_key)(void*)) {
+	struct _irc_hash_table *ht;
 
-void *ilHashFind(ilHashTable*ht, char *key) {return 0;}
-void *ilHashDel(ilHashTable*ht, char *key, void *data) {return 0;}
-void *ilHashAdd(ilHashTable*ht, char *key, void*data) {return 0;}
+	ht = oalloc(sizeof(struct _irc_hash_table));
+	ht->table = oalloc(sizeof(struct _irc_hash_bucket*) * (size));
+	ht->get_key = get_key;
+	ht->size = size;
+
+	return ht;
+}
+
+ilHashTable *ilRehashTable(ilHashTable *ht, int newsize) {
+}
+
+ilHashTable *ilEmptyHashTable(ilHashTable *ht) {
+}
+
+ilHashTable *ilFreeHashTable(ilHashTable *ht) {
+	ilEmptyHashTable(ht);
+	free(ht->table);
+	free(ht);
+	return NULL;
+}
+
+void *ilHashFind(ilHashTable*ht, char *key) {
+}
+
+void *ilHashDel(ilHashTable*ht, void *data) {
+}
+
+void *ilHashAdd(ilHashTable*ht, void*data) {
+}
 
 
