@@ -1,4 +1,4 @@
-/* $Id: hash.h,v 1.5 2002/01/06 08:27:06 mysidia Exp $ */
+/* $Id: hash.h,v 1.6 2002/01/06 08:39:21 mysidia Exp $ */
 
 /*
  *  Hash Table Header
@@ -62,5 +62,5 @@ ilHashTable *ilEmptyHashTable(ilHashTable *);
 ilHashTable *ilFreeHashTable(ilHashTable *);
 
 void *ilHashFind(ilHashTable*, char *);
-void *ilHashDel(ilHashTable*, void *);
+int ilHashDel(ilHashTable*, void *);
 void *ilHashAdd(ilHashTable*, void*);
