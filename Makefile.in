@@ -86,7 +86,7 @@ am__include = @am__include@
 am__quote = @am__quote@
 install_sh = @install_sh@
 
-# $Id: Makefile.in,v 1.21 2002/10/15 00:07:51 mysidia Exp $
+# $Id: Makefile.in,v 1.22 2003/01/15 18:02:59 mysidia Exp $
 #
 #
 DEFS = -D_IRCLIB_INTERNAL @DEFS@
@@ -105,7 +105,7 @@ lib_LTLIBRARIES = libirc.la
 libirc_la_SOURCES = match.c mem.c sock.c server.c irc.c channel.c dns.c hash.c \
  proto.c
 
-include_HEADERS = irclib.h proto.h
+include_HEADERS = irclib.h proto.h hash.h timer.h dns.h
 
 DISTCLEANFILES = config.guess config.sub ltconfig ltmain.sh libtool
 subdir = .

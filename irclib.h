@@ -156,7 +156,9 @@ typedef struct _ircbf IrcLibSocketBuf;
 		type var[ne]
 #else
 #define PRIV_MEM(type, var, ne) \
-		type _##__LINE__##_var__ [ne]
+		type _##__LINE__##_##var##__
+#define PRIV_MEM_AR(type, var, ne) \
+		type _##__LINE__##_##var##__ [ne]
 #endif
 
 struct IRC(_MsgTab)
