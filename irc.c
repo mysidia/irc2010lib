@@ -31,16 +31,21 @@
 #include "irclib.h"
 #include "dns.h"
 
-ID("$Id: irc.c,v 1.10 2001/11/17 03:59:13 mysidia Exp $");
+ID("$Id: irc.c,v 1.11 2001/12/16 10:01:44 mysidia Exp $");
 time_t CTime;
 
+/**
+ * Library initiation
+ */
 void LibIrcInit()
 {
 	event_init();
 	IRC(dns_init)();
 }
 
-
+/**
+ * @brief The system event loop
+ */
 int IRC(SystemLoop)()
 {
 	CTime = time(NULL);
@@ -49,6 +54,16 @@ int IRC(SystemLoop)()
 		abort();
 }
 
+/**
+ * @brief Split a buffer into an IRC message
+ * \param mb Message buffer
+ * mb->command = command to execute
+ * mb->prefix = [optional] sender
+ * mb->numarg = count of command arguments
+ * mb->args = command arguments
+ * \param buf Buffer to split along spaces, : after space or MAXPARA
+ * parameters so far signals end of command/argument splitting
+ */
 void IRC(MakeMessage)(IRC(Message)*mb, char *buf)
 {
 	char *p, *m;
@@ -106,4 +121,4 @@ void IRC(MakeMessage)(IRC(Message)*mb, char *buf)
 	}
 
 	mb->numarg = i;
-}
+} /**/

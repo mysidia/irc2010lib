@@ -30,7 +30,7 @@
 
 #include "irclib.h"
 #include "dns.h"
-ID("$Id: dns.c,v 1.10 2001/11/01 22:31:07 mysidia Exp $");
+ID("$Id: dns.c,v 1.11 2001/12/16 10:01:44 mysidia Exp $");
 
 static adns_state dns_state;
 static LIST_HEAD(, _dnsquery) queries;
@@ -38,6 +38,9 @@ static LIST_HEAD(, _dnsquery) queries;
 static void IrcLibEventDNSProcess(int fd, short evType, void *pData);
 static void check_dns();
 
+/**
+ * @brief Initialize dns queue/checks/events
+ */
 void IRC(dns_init)()
 {
 	int errv;
