@@ -31,11 +31,21 @@
 #include "irclib.h"
 #include <stddef.h>
 
-ID("$Id: sock.c,v 1.28 2001/11/17 04:13:42 mysidia Exp $");
+ID("$Id: sock.c,v 1.29 2001/11/17 04:23:53 mysidia Exp $");
 
 void IrcLibEventSocket(int fd, short evType, void *p);
 void IrcLibEventListener(int fd, short evType, void *p);
 void IrcLibEventSockWrite(int fd, short evType, void *p);
+
+int IRCUnknown(IRC(Socket)*q, IRC(Message)*t)
+{
+	IrcSend(q, ":me NOTICE -you- :Bad command\r\n");
+}
+
+IRC(MsgTab) IrcLibDefaultClientTable[] =
+{
+	{ NULL, IRCUnknown }
+};
 
 /********************************************************************/
 
@@ -646,6 +656,7 @@ int
 IrcLibDefaultListenHandler(IrcSocket *q, char *buf)
 {
 	q->func = IrcLibDefaultClientHandler;
+	q->parser = IrcLibDefaultClientTable;
 }
 
 int
@@ -657,11 +668,25 @@ IrcLibDefaultSockHandler(IrcSocket *q, char *buf)
 int
 IrcLibDefaultClientHandler(IrcSocket *q, char *buf)
 {
-	if (q->port) {
+	if (q->parser) {
 		IRC(Message) m;
 		int i;
 
 		IRC(MakeMessage)(&m, buf);
+
+		if (m.command) {
+			for(i = 0; q->parser[i].name; i++)
+				if (strcasecmp(q->parser[i].name, m.command) == 0)
+					break;
+		}
+		else
+			for(i = 0; q->parser[i].name; i++)
+				;
+
+		if (q->parser[i].handler) {
+			(* q->parser[i].handler)(q, &m);
+		}
+
 		// IrcSend(q, "[prefix = %s]\r\n", m.prefix);
 		// IrcSend(q, "[command = %s]\r\n", m.command);
 
