@@ -91,15 +91,21 @@ int socket_bind(Socket *theSocket, int portNum)
 	return 0;
 }
 
-int socket_listen(Socket *theSocket)
+Listener *socket_listen(Socket *theSocket)
 {
+	Listener *port;
+
 	if ( listen(theSocket->fd, 5) < 0 ) {
 		perror("listen");
-		return -1;
+		return NULL;
 	}
 
+	port = oalloc(sizeof(Listener));
+
+	port->sock = theSocket;
+
+	return port;
 	// topFd = listenDesc;
-	return 0;
 }
 
 void socket_addevents(Socket *theSocket)
