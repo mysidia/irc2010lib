@@ -104,6 +104,7 @@ int query_dns(int reverse, char *host, DnsCallBack *func, void *data)
 		}
 
 		query->ip = oalloc(strlen(host)+1);
+		query->rev = reverse;
 		strcpy(query->ip, host);
 
 		if (reverse ? adns_submit(dns_state, ip2ptr(host), adns_r_ptr,

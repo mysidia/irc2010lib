@@ -20,6 +20,7 @@ struct _dnsquery
 {
 	adns_query query;
 	char *ip;
+	int rev;
 
 	LIST_HEAD(, _dnscallent) calls;
 	LIST_ENTRY(_dnsquery) query_lst;
