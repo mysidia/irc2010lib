@@ -1,4 +1,4 @@
-/* $Id: hash.h,v 1.11 2002/10/12 01:23:59 mysidia Exp $ */
+/* $Id: hash.h,v 1.12 2004/03/15 07:13:50 mysidia Exp $ */
 
 /*
  *  Hash Table Header
@@ -58,6 +58,7 @@ struct _irc_hash_table
 {
 	struct _irc_hash_bucket **table;
 	const char* (* get_key)(void *item);
+	u_int32_t (* hash_name)(const char*);
 	int size;
 };
 
@@ -71,6 +72,8 @@ ircHashTable *ircEmptyHashTable(ircHashTable *);
 ircHashTable *ircFreeHashTable(ircHashTable *);
 
 int ircHashDel(ircHashTable*, void *);
+u_int32_t IrcDefaultHashKey(const char *datum);
+	
 
 #define ilHashTable	ircHashTable
 #define ilHashDel	ircHashDel

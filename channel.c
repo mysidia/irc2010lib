@@ -300,7 +300,7 @@ void IRC(SendModeChange) (
 	}
 
 	// IrcModeBitMap[].mask1  mask2   fl(letter)
-	IrcSend("MODE %s %s" IEOL, IRC(ChanCgetName)(chan_name),
+	IrcSend(so.sock, "MODE %s %s" IEOL, IRC(ChanCgetName)(chan_name),
 		buf);
 }
 

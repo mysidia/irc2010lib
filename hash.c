@@ -32,7 +32,7 @@
 #include "hash.h"
 
 u_int32_t
-IRCHashKey(const char *datum)
+IrcDefaultHashKey(const char *datum)
 {
 	u_int16_t hash = 0x7edcb;
 
@@ -51,6 +51,7 @@ ilHashTable *ilNewHashTable(int size, const char* (* get_key)(void*)) {
 	ht->table = oalloc(sizeof(struct _irc_hash_bucket*) * (size));
 	ht->get_key = get_key;
 	ht->size = size;
+	ht->hash_name = IrcDefaultHashKey;
 
 	return ht;
 }
@@ -131,7 +132,7 @@ void *ilHashFind(ilHashTable*ht, char *key) {
 	int i = 0;
 	struct _irc_hash_entry *he;
 
-	i = IRCHashKey(key) % ht->size;
+	i = ht->hash_name(key) % ht->size;
 
 	if (ht->table[i] == 0 || ht->table[i]->first == 0)
 			return 0;
@@ -151,7 +152,7 @@ int ilHashDel(ilHashTable*ht, void *data) {
 	struct _irc_hash_entry *he, *htmp, *he_next;
 
 	key = ht->get_key(he->item);
-	i = IRCHashKey(key) % ht->size;
+	i = ht->hash_name(key) % ht->size;
 
 	if (ht->table[i] == 0 || ht->table[i]->first == 0)
 			return 0;
@@ -185,7 +186,7 @@ void *ilHashAdd(ilHashTable *ht, void *data)
 	struct _irc_hash_entry *he;
 
 	key = ht->get_key(he->item);
-	i = IRCHashKey(key) % ht->size;
+	i = ht->hash_name(key) % ht->size;
 
 	if (ht->table[i] == 0)
 		ht->table[i] = oalloc(sizeof(struct _irc_hash_bucket));
