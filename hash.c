@@ -48,3 +48,15 @@ IRCHashKey(char *datum)
 	return 0;
 }
 
+
+
+ilHashTable *ilNewHashTable(int size) {return 0;}
+ilHashTable *ilRehashTable(ilHashTable *ht, int newsize) {return 0;}
+ilHashTable *ilEmptyHashTable(ilHashTable *ht) {return 0;}
+ilHashTable *ilFreeHashTable(ilHashTable *ht) {return 0;}
+
+void *ilHashFind(ilHashTable*ht, char *key) {return 0;}
+void *ilHashDel(ilHashTable*ht, char *key, void *data) {return 0;}
+void *ilHashAdd(ilHashTable*ht, char *key, void*data) {return 0;}
+
+

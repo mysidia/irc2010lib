@@ -224,9 +224,11 @@ IrcChannel *IrcFindChannelHash ( IRC(ChannelName) *cn )
 {
 	if (chanHash == 0)
 		return 0;
+	return ilHashFind(chanHash, cn);
 }
 
 void IrcDelChannelHash ( IrcChannel *cl )
 {
+	(void)ilHashDel(chanHash, cl->channelName->name, cl);
 }
 
