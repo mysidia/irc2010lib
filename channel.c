@@ -65,6 +65,9 @@ void IRC(ChanFreeName) (IRC(ChannelName) *p)
 	free(p);
 }
 
+/**
+ * Update name ptr
+ */
 void IRC(ChanCsetName) (IRC(ChannelName) *cn, const char *str)
 {
 	if ( ( cn )->name )
