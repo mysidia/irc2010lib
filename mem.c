@@ -29,7 +29,7 @@
  */
 
 #include "irclib.h"
-ID("$Id: mem.c,v 1.6 2001/10/27 05:05:46 mysidia Exp $");
+ID("$Id: mem.c,v 1.7 2002/01/30 02:30:48 mysidia Exp $");
 
 /*! 
  * \fn void * oalloc (size_t size)
@@ -46,18 +46,21 @@ oalloc(size_t iMemLen)
 	void *vBuf;
 
 	if ((vBuf = calloc(iMemLen, 1)) == (void *)0)
-		abort();
+		abort(); /* Allocate memory or die. */
 	return vBuf;
 }
 
+/**
+ * Release a socket from memory [and handle event flush]
+ */
 void IrcFreeSocket(IrcSocket *q)
 {
 	if (q->theEvent) {
-		event_del(q->theEvent);
+		event_del(q->theEvent); /* Delete the event */
 		free(q->theEvent);
 	}
 
-	free(q);
+	free(q); /* Free the socket as requested */
 }
 
 
@@ -113,12 +116,12 @@ void AppendBuffer(char **buf, const char *add)
 
      x = newbuf = (char *)oalloc(((*buf ? strlen(*buf) : 0)) + strlen(add) + 4);
      if (!newbuf) return;
-     if (*buf)
+     if (*buf) /* Lengthen existing buffer */
      {
        bzero( newbuf, (*buf ? strlen( *buf ):0) + strlen(add) + 2 );
        memcpy( newbuf, *buf, strlen(*buf) );
        x = newbuf + strlen(*buf);
-     } else x = newbuf;
+     } else x = newbuf; /* Brand new buffer */
      strcpy(x, add); /* this is ok */
      if (*buf) {
          free(*buf);

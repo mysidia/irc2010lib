@@ -1,5 +1,5 @@
 /*
- *  Another test server
+ *  Test server for binary protocols (in this case Socks)
  *  Copyright C 2001 ***REMOVED***.  All Rights Reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 #include "irclib.h"
 #include "dns.h"
 #include <assert.h>
-ID("$Id: sockmon.c,v 1.1 2002/01/15 18:09:23 mysidia Exp $");
+ID("$Id: sockmon.c,v 1.2 2002/01/30 02:30:48 mysidia Exp $");
 
 IRC(Socket) *testCli;
 
