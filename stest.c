@@ -18,7 +18,7 @@ int main()
 
 	if (LibIrc_socket_bind(p, 3030, addr) < 0)
 		abort();
-	if ((q = LibIrc_socket_listen(p)) == NULL)
+	if ((q = LibIrcMakeListener(p)) == NULL)
 		abort();
 	printf("Listening on %d\n", 3030);
 

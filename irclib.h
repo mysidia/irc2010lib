@@ -138,6 +138,9 @@ struct _ircsocket
 	char __inbuf__[sizeof(IrcLibSocketBuf)];
 	char __outbuf__[sizeof(IrcLibSocketBuf)];
 #endif
+
+	int (* func)(struct _ircsocket*, char *);
+
 	LIST_ENTRY(_ircsocket)	socket_list;
 };
 
@@ -159,7 +162,7 @@ struct _irccon
 int LibIrcSockNonBlock(int listenDesc);
 IrcSocket *LibIrc_socket_make();
 int LibIrc_socket_bind(IrcSocket *theSocket, int portNum, struct in_addr addr);
-IrcListener *LibIrc_socket_listen(IrcSocket *theSocket);
+IrcListener *LibIrcMakeListener(IrcSocket *theSocket);
 void LibIrcSocketAddEvents(IrcSocket *theSocket);
 void LibIrcListenerAddEvents(IrcListener *);
 
@@ -175,5 +178,8 @@ void IrcBufMakeEmpty(IrcBuf *t);
 void LibIrcInit();
 int LibIrcSystemLoop();
 void IrcSend(IrcSocket *, const char *, ...);
+int IrcLibDefaultSockHandler(IrcSocket *, char *);
+int IrcLibDefaultListenHandler(IrcSocket *, char *);
+int IrcLibDefaultClientHandler(IrcSocket *, char *);
 
 #define IrcLibPop IrcLib_pop

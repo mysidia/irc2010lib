@@ -70,12 +70,13 @@ IrcSocket *LibIrc_socket_make()
 	sockLink = oalloc(sizeof(IrcSocket));
 
 	sockLink->fd = fd;
+	sockLink->func = IrcLibDefaultSockHandler;
 
 #ifdef LIST_ENTRY_INIT
 	LIST_ENTRY_INIT(sockLink, socket_list);
 #endif
 
-	return;
+	return sockLink;
 }
 
 void IrcLibdelCon(IrcSocket *q)
@@ -125,7 +126,7 @@ int LibIrc_socket_bind(IrcSocket *theSocket, int portNum, struct in_addr addr)
 	return 0;
 }
 
-IrcListener *LibIrc_socket_listen(IrcSocket *theSocket)
+IrcListener *LibIrcMakeListener(IrcSocket *theSocket)
 {
 	IrcListener *port;
 
@@ -137,6 +138,7 @@ IrcListener *LibIrc_socket_listen(IrcSocket *theSocket)
 	port = oalloc(sizeof(IrcListener));
 
 	port->sock = theSocket;
+	port->sock->func = IrcLibDefaultListenHandler;
 	port->topFd = theSocket->fd;
 	LIST_INIT(&port->links);
 
@@ -261,6 +263,7 @@ IrcLibEventListener(int fd, short evType, void *vI)
 			IrcLibAddCon(li, p);
 			p->fd = pFd;
 			p->addr = sai.sin_addr;
+			(* li->sock->func)(p, "");
 //XXX debug
 			printf("Incoming link from %x\n", sai.sin_addr.s_addr);
 		}
@@ -313,8 +316,12 @@ IrcLibEventSocket(int fd, short evType, void *p)
 		}
 	
 		while (IrcLib_pop(&q->inBuf, buf, 0)) {
-			// For now just flush out the buffer
-IrcSend(q, "[%s]\r\n", buf);
+			if ( (* q->func)(q, buf) < 0 ) {
+				close(q->fd);
+				IrcLibdelCon(q);
+				IrcFreeSocket(q);
+				return;
+			}
 		}
 	}
 
@@ -338,7 +345,8 @@ IrcSend(q, "[%s]\r\n", buf);
 /**
  * @brief Fired when a socket becomes writable
  */
-void IrcLibEventSockWrite(int fd, short evType, void *p)
+void
+IrcLibEventSockWrite(int fd, short evType, void *p)
 {
 	IrcSocket *q = (IrcSocket *)p;
 
@@ -360,7 +368,8 @@ typedef struct _ircbq BufQel;
  * @brief Called by shove() to push a piece of the message
  *        before a \\n onto the buffer.
  */
-static char *qPush(IrcBuf *t, char *text, char *sep) {
+static char *
+qPush(IrcBuf *t, char *text, char *sep) {
 	BufQel *z;
 
 	z = (BufQel *)oalloc(sizeof(BufQel) + (sep - text + 1));
@@ -402,7 +411,8 @@ static char *qPush(IrcBuf *t, char *text, char *sep) {
  *        contained.
  */
 
-char *IrcLibShove(IrcBuf *t, char *textIn, size_t textLen)
+char *
+IrcLibShove(IrcBuf *t, char *textIn, size_t textLen)
 {
 	char *p;
 	char *text = textIn;
@@ -429,7 +439,8 @@ char *IrcLibShove(IrcBuf *t, char *textIn, size_t textLen)
  *        then the text of the next item will
  *        fill cmd, and be removed from the buffer.
  */
-int IrcLib_pop(IrcBuf *t, char cmd[IRCBUFSIZE], int sendcr) {
+int
+IrcLib_pop(IrcBuf *t, char cmd[IRCBUFSIZE], int sendcr) {
 	BufQel *f;
 	char *cp;
 
@@ -476,7 +487,8 @@ int IrcLib_pop(IrcBuf *t, char cmd[IRCBUFSIZE], int sendcr) {
  * @return False if the buffer contains any text,
  *         not-false if the buffer contains text.
  */
-int IrcLibBufIsEmpty(IrcBuf *t)
+int
+IrcLibBufIsEmpty(IrcBuf *t)
 {
 	if (t->firstEls == NULL)
 		return 1;
@@ -487,10 +499,31 @@ int IrcLibBufIsEmpty(IrcBuf *t)
  * @brief Empty the buffer
  * @post  The buffer contains no items.
  */
-void IrcBufMakeEmpty(IrcBuf *t)
+void
+IrcBufMakeEmpty(IrcBuf *t)
 {
 	char cmd[1025];
 
 	while(IrcLib_pop(t, cmd, 0))
 		return;
 }
+
+int
+IrcLibDefaultListenHandler(IrcSocket *q, char *buf)
+{
+	q->func = IrcLibDefaultClientHandler;
+}
+
+int
+IrcLibDefaultSockHandler(IrcSocket *q, char *buf)
+{
+}
+
+
+int
+IrcLibDefaultClientHandler(IrcSocket *q, char *buf)
+{
+	IrcSend(q, "[%s]\r\n", buf);
+}
+
+
