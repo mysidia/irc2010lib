@@ -36,6 +36,8 @@
 #include <errno.h>
 #include <time.h>
 
+#define IRC(x)	IrcLib##x
+
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -147,29 +149,30 @@ struct _ircsocket
 	LIST_ENTRY(_ircsocket)	socket_list;
 };
 
-typedef struct _ircsocket IrcSocket;
+typedef struct _ircsocket IRC(Socket);
 
 struct _irclistener
 {
 	int topFd;
 
-	IrcSocket *sock;
+	IRC(Socket) *sock;
 	LIST_HEAD(, _ircsocket)	links;
-}; typedef struct _irclistener IrcListener;
+}; 
+typedef struct _irclistener IRC(Listener);
 
 
 struct _irccon
 {
 };
 
-int LibIrcSockNonBlock(int listenDesc);
-IrcSocket *LibIrc_socket_make();
-int LibIrc_socket_bind(IrcSocket *theSocket, int portNum, struct in_addr addr);
-IrcListener *LibIrcMakeListener(IrcSocket *theSocket);
-void LibIrcSocketAddEvents(IrcSocket *theSocket);
-void LibIrcListenerAddEvents(IrcListener *);
+int IRC(SockNonBlock) (int listenDesc);
+IRC(Socket) *IRC(socket_make)();
+int IRC(socket_bind)(IRC(Socket) *theSocket, int portNum, struct in_addr addr);
+IRC(Listener) *IRC(MakeListener)(IRC(Socket) *theSocket);
+void IRC(SocketAddEvents)(IRC(Socket) *theSocket);
+void IRC(ListenerAddEvents)(IRC(Listener) *);
 
-int IrcLibReadPackets(IrcSocket *ptrLink);
+int IrcLibReadPackets(IRC(Socket) *ptrLink);
 void IrcLibEventListener(int fd, short evType, void *p);
 void IrcLibEventSocket(int fd, short evType, void *p);
 void IrcLibEventFlushSockets(int fd, short evType, void *p);
@@ -179,11 +182,15 @@ int IrcLibBufIsEmpty(IrcBuf *t);
 void IrcBufMakeEmpty(IrcBuf *t);
 
 void LibIrcInit();
-int LibIrcSystemLoop();
-void IrcSend(IrcSocket *, const char *, ...);
-int IrcLibDefaultSockHandler(IrcSocket *, char *);
-int IrcLibDefaultListenHandler(IrcSocket *, char *);
-int IrcLibDefaultClientHandler(IrcSocket *, char *);
+int IRC(SystemLoop)();
+void IrcSend(IRC(Socket) *, const char *, ...);
+int IrcLibDefaultSockHandler(IRC(Socket) *, char *);
+int IrcLibDefaultListenHandler(IRC(Socket) *, char *);
+int IrcLibDefaultClientHandler(IRC(Socket) *, char *);
 extern time_t CTime;
 
-#define IrcLibPop IrcLib_pop
+
+#define IrcLibPop	IrcLib_pop
+#define IrcListener	IRC(Listener)
+#define IrcSocket	IRC(Socket)
+

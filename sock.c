@@ -60,7 +60,7 @@ int LibIrcSockNonBlock(int listenDesc)
 	return 0;
 }
 
-IrcSocket *LibIrc_socket_make()
+IrcSocket *IRC(socket_make)()
 {
 	IrcSocket *sockLink;
 	int fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -101,11 +101,11 @@ void IrcLibFreeSocket(IrcSocket *q)
 void IrcLibAddCon(IrcListener *li, IrcSocket *q)
 {
 	LIST_INSERT_HEAD(&(li->links), q, socket_list);
-	LibIrcSocketAddEvents(q);
+	IRC(SocketAddEvents)(q);
 }
 
 
-int LibIrc_socket_bind(IrcSocket *theSocket, int portNum, struct in_addr addr)
+int IRC(socket_bind)(IrcSocket *theSocket, int portNum, struct in_addr addr)
 {
 	struct sockaddr_in sa;
 	int reuseAddr;
@@ -127,7 +127,7 @@ int LibIrc_socket_bind(IrcSocket *theSocket, int portNum, struct in_addr addr)
 	return 0;
 }
 
-IrcListener *LibIrcMakeListener(IrcSocket *theSocket)
+IrcListener *IRC(MakeListener)(IrcSocket *theSocket)
 {
 	IrcListener *port;
 
@@ -149,7 +149,7 @@ IrcListener *LibIrcMakeListener(IrcSocket *theSocket)
 	return port;
 }
 
-void LibIrcSocketAddEvents(IrcSocket *theSocket)
+void IRC(SocketAddEvents)(IrcSocket *theSocket)
 {
 	struct event *p;
 	int foundRead = 0, foundWrite = 0;
@@ -174,7 +174,7 @@ void LibIrcSocketAddEvents(IrcSocket *theSocket)
 	theSocket->theEvent = p;
 }
 
-void LibIrcListenerAddEvents(IrcListener *thePort)
+void IRC(ListenerAddEvents)(IrcListener *thePort)
 {
 	struct event *p; 
 
@@ -285,7 +285,7 @@ IrcLibEventListener(int fd, short evType, void *vI)
 			close(pFd);
 	}
 
-	LibIrcListenerAddEvents(li);
+	IRC(ListenerAddEvents)(li);
 }
 
 /**
@@ -367,7 +367,7 @@ IrcLibEventSocket(int fd, short evType, void *p)
 		
 	}
 
-	LibIrcSocketAddEvents(q);
+	IRC(SocketAddEvents)(q);
 }
 
 /**

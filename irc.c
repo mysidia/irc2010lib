@@ -34,7 +34,7 @@ void LibIrcInit()
 }
 
 
-int LibIrcSystemLoop()
+int IRC(SystemLoop)()
 {
 	CTime = time(NULL);
 
