@@ -183,6 +183,7 @@ struct _ircsocket
 	PRIV_MEM(IrcLibSocketBuf,	inBuf,		1);
 	PRIV_MEM(IrcLibSocketBuf,	outBuf,		1);
 	PRIV_MEM(struct _ircTimer,	timer,		1);
+	PRIV_MEM(void*,			exData,		1);
 
 	IRC(MsgTab)	*parser;
 
@@ -245,6 +246,8 @@ int IRC(BufDeQueue)(IrcBuf *t, char cmd[IRCBUFSIZE], int);
 int IrcLibBufIsEmpty(IrcBuf *t);
 void IrcBufMakeEmpty(IrcBuf *t);
 char *IrcLibBufShoveBinary(IrcBuf *t, char* text, size_t len);
+void IrcSetSockHandler(struct _ircsocket *q, int (* newFunc)(struct _ircsocket*, char *));
+
 
 void LibIrcInit();
 int IRC(SystemLoop)();

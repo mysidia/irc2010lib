@@ -31,7 +31,7 @@
 #include "irclib.h"
 #include <stddef.h>
 
-ID("$Id: sock.c,v 1.32 2002/01/15 18:09:23 mysidia Exp $");
+ID("$Id: sock.c,v 1.33 2003/01/15 18:19:08 mysidia Exp $");
 
 void IrcLibEventSocket(int fd, short evType, void *p);
 void IrcLibEventListener(int fd, short evType, void *p);
@@ -720,6 +720,12 @@ IrcBufMakeEmpty(IrcBuf *t)
 
 	while(IRC(BufDeQueue)(t, cmd, 2))
 		return;
+}
+
+void
+IrcSetSockHandler(IrcSocket *q, int (* newFunc)(struct _ircsocket*, char *))
+{
+    q->func = newFunc;
 }
 
 int
