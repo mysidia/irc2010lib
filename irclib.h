@@ -110,6 +110,9 @@ int match(const char*, const char*);
 void *oalloc(size_t);
 char *str_dup(const char *);
 
+struct IRC(_Message);
+struct _ircsocket;
+
 #define SOCKBUFSIZE 1024
 #define IRCBUFSIZE 512
 #define IRCBUFSZ   512
@@ -139,6 +142,15 @@ typedef struct _ircbf IrcLibSocketBuf;
 #define PRIV_MEM(type, var, ne) \
 		type _##__LINE__##_var__ [ne]
 
+
+struct IRC(_MsgTab)
+{
+	const char *name;
+	int (* handler)(struct _ircsocket*, struct IRC(_Message)*);
+};
+
+typedef struct IRC(_MsgTab) IRC(MsgTab);
+
 /**
  * An IRC Connection endpoint
  */
@@ -164,6 +176,8 @@ struct _ircsocket
 	PRIV_MEM(IrcLibSocketBuf, __inbuf__, 1);
 	PRIV_MEM(IrcLibSocketBuf, __outbuf__, 1);
 #endif
+
+	IRC(MsgTab)	*parser;
 
 	time_t lasttime;
 	struct _irclistener *port;
