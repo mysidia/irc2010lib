@@ -1,4 +1,4 @@
-/* $Id: hash.h,v 1.10 2002/07/14 00:25:24 mysidia Exp $ */
+/* $Id: hash.h,v 1.11 2002/10/12 01:23:59 mysidia Exp $ */
 
 /*
  *  Hash Table Header
@@ -39,7 +39,7 @@ struct _irc_hash_entry;
 struct _irc_hash_bucket;
 
 /**
- * An entry in an [il?] hash table
+ * An entry in an [irc?] hash table
  */
 struct _irc_hash_entry
 {
@@ -61,15 +61,23 @@ struct _irc_hash_table
 	int size;
 };
 
-typedef struct _irc_hash_table ilHashTable;
-void *ilHashFind(ilHashTable*, char *);
-void *ilHashAdd(ilHashTable*, void*);
+typedef struct _irc_hash_table ircHashTable;
+void *ircHashFind(ircHashTable*, char *);
+void *ircHashAdd(ircHashTable*, void*);
 
-ilHashTable *ilNewHashTable(int size, const char* (* getKeyPred)(void*));
-ilHashTable *ilRehashTable(ilHashTable *, int newsize);
-ilHashTable *ilEmptyHashTable(ilHashTable *);
-ilHashTable *ilFreeHashTable(ilHashTable *);
+ircHashTable *ircNewHashTable(int size, const char* (* getKeyPred)(void*));
+ircHashTable *ircRehashTable(ircHashTable *, int newsize);
+ircHashTable *ircEmptyHashTable(ircHashTable *);
+ircHashTable *ircFreeHashTable(ircHashTable *);
 
-int ilHashDel(ilHashTable*, void *);
+int ircHashDel(ircHashTable*, void *);
 
+#define ilHashTable	ircHashTable
+#define ilHashDel	ircHashDel
+#define ilHashFind	ircHashFind
+#define ilHashAdd	ircHashAdd
+#define ilNewHashTable	ircNewHashTable
+#define	ilRehashTable	ircRehashTable
+#define ilEmptyHashTable ircEmptyHashTable
+#define ilFreeHashTable	ircFreeHashTable
 #endif

@@ -1,5 +1,5 @@
 /*
- *  Timed Event Implementation
+ *  Timer header
  *  Copyright C 2001 ***REMOVED***.  All Rights Reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -25,19 +25,33 @@
  */
 
 /**
- * @file timer.c
- * @brief Timed events
- *
- * An IRC client (or server) periodically needs to schedule events
- * to occur (ex, idle checks)
- *
- * Two types of timed events to exist [at least]:
- *       - Global timed event
- *       - Timed event to be iterated over each socket
+ * @file timer.h
+ * @brief Timers Header
  */
 
-/*
-typedef int timerCallBack (void *pData);
-typedef int timerCallBackSocket (IRC(Socket)*, void *pData);
+#define IEOL "\r\n"
 
-*/
+struct _ircsocket;
+struct IrcLibSession;
+
+typedef int timerCallBack (void *pData);
+typedef int timerCallBackSocket (struct _ircsocket*, void *pData );
+
+
+struct ircTimer {
+	timer_t			timeSpec;
+	timerCallBack 	*	func;
+};
+
+void ircTimerSchedule(struct _ircsocket*,
+			struct timeval tv, timerCallBack *func);
+
+void ircTimerScheduleSession(
+	struct IrcLibSession* ses,
+	struct timeval tv,
+	timerCallBackSocket *func
+);
+
+void ircTimerScheduleGlobal(struct timeval tv, timerCallBackSocket *func);
+
+

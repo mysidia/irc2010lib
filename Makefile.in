@@ -86,7 +86,7 @@ am__include = @am__include@
 am__quote = @am__quote@
 install_sh = @install_sh@
 
-# $Id: Makefile.in,v 1.19 2002/09/21 23:04:06 mysidia Exp $
+# $Id: Makefile.in,v 1.20 2002/10/12 01:23:59 mysidia Exp $
 #
 #
 DEFS = -D_IRCLIB @DEFS@
@@ -105,6 +105,7 @@ lib_LTLIBRARIES = libirc.la
 libirc_la_SOURCES = match.c mem.c sock.c server.c irc.c channel.c dns.c hash.c \
  proto.c
 
+include_HEADERS = irclib.h proto.h
 
 DISTCLEANFILES = config.guess config.sub ltconfig ltmain.sh libtool
 subdir = .
@@ -155,10 +156,12 @@ LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 CFLAGS = @CFLAGS@
 DIST_SOURCES = $(libirc_la_SOURCES) $(ctest_SOURCES) $(sockmon_SOURCES) \
 	$(stest_SOURCES)
-DIST_COMMON = README AUTHORS COPYING ChangeLog INSTALL Makefile.am \
-	Makefile.in NEWS THANKS aclocal.m4 config.guess config.sub \
-	configure configure.in depcomp install-sh ltconfig ltmain.sh \
-	missing mkinstalldirs
+HEADERS = $(include_HEADERS)
+
+DIST_COMMON = README $(include_HEADERS) AUTHORS COPYING ChangeLog \
+	INSTALL Makefile.am Makefile.in NEWS THANKS aclocal.m4 \
+	config.guess config.sub configure configure.in depcomp \
+	install-sh ltconfig ltmain.sh missing mkinstalldirs
 SOURCES = $(libirc_la_SOURCES) $(ctest_SOURCES) $(sockmon_SOURCES) $(stest_SOURCES)
 
 all: all-am
@@ -300,6 +303,24 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
+includeHEADERS_INSTALL = $(INSTALL_HEADER)
+install-includeHEADERS: $(include_HEADERS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(includedir)
+	@list='$(include_HEADERS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " $(includeHEADERS_INSTALL) $$d$$p $(DESTDIR)$(includedir)/$$f"; \
+	  $(includeHEADERS_INSTALL) $$d$$p $(DESTDIR)$(includedir)/$$f; \
+	done
+
+uninstall-includeHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(include_HEADERS)'; for p in $$list; do \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " rm -f $(DESTDIR)$(includedir)/$$f"; \
+	  rm -f $(DESTDIR)$(includedir)/$$f; \
+	done
 
 ETAGS = etags
 ETAGSFLAGS =
@@ -426,12 +447,12 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES) $(PROGRAMS)
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(HEADERS)
 install-binPROGRAMS: install-libLTLIBRARIES
 
 
 installdirs:
-	$(mkinstalldirs) $(DESTDIR)$(libdir) $(DESTDIR)$(bindir)
+	$(mkinstalldirs) $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(includedir)
 
 install: install-am
 install-exec: install-exec-am
@@ -476,7 +497,7 @@ info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-includeHEADERS
 
 install-exec-am: install-binPROGRAMS install-libLTLIBRARIES
 
@@ -496,8 +517,8 @@ mostlyclean: mostlyclean-am
 mostlyclean-am: mostlyclean-compile mostlyclean-generic \
 	mostlyclean-libtool
 
-uninstall-am: uninstall-binPROGRAMS uninstall-info-am \
-	uninstall-libLTLIBRARIES
+uninstall-am: uninstall-binPROGRAMS uninstall-includeHEADERS \
+	uninstall-info-am uninstall-libLTLIBRARIES
 
 .PHONY: GTAGS all all-am check check-am clean clean-binPROGRAMS \
 	clean-generic clean-libLTLIBRARIES clean-libtool dist dist-all \
@@ -505,12 +526,13 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am \
 	distclean-depend distclean-generic distclean-libtool \
 	distclean-tags distcleancheck distdir dvi dvi-am info info-am \
 	install install-am install-binPROGRAMS install-data \
-	install-data-am install-exec install-exec-am install-info \
-	install-info-am install-libLTLIBRARIES install-man \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	tags uninstall uninstall-am uninstall-binPROGRAMS \
+	install-data-am install-exec install-exec-am \
+	install-includeHEADERS install-info install-info-am \
+	install-libLTLIBRARIES install-man install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool tags uninstall \
+	uninstall-am uninstall-binPROGRAMS uninstall-includeHEADERS \
 	uninstall-info-am uninstall-libLTLIBRARIES
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

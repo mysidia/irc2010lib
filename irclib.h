@@ -96,6 +96,7 @@
 
 #include "queue.h"
 #include "hash.h"
+#include "timer.h"
 
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -173,6 +174,7 @@ struct _ircsocket
 	PRIV_MEM(char*,			tailBuf,	1);
 	PRIV_MEM(IrcLibSocketBuf,	inBuf,		1);
 	PRIV_MEM(IrcLibSocketBuf,	outBuf,		1);
+	PRIV_MEM(struct ircTimer,	timer,		1);
 
 	IRC(MsgTab)	*parser;
 
@@ -233,6 +235,7 @@ char *IRC(BufShove)(IrcBuf *t, char *textIn, size_t textLen);
 int IRC(BufDeQueue)(IrcBuf *t, char cmd[IRCBUFSIZE], int);
 int IrcLibBufIsEmpty(IrcBuf *t);
 void IrcBufMakeEmpty(IrcBuf *t);
+char *IrcLibBufShoveBinary(IrcBuf *t, char* text, size_t len);
 
 void LibIrcInit();
 int IRC(SystemLoop)();
@@ -279,8 +282,9 @@ extern time_t CTime;
 
 struct IRC(_session)
 {
-	IRC(Socket) *sock;
-	ilHashTable **chanHash;
+	IRC(Socket) *sock;		/* Daemon socket */
+	ircHashTable **chanHash;	/* Channels */
+	LIST_HEAD(, ircTimer)	timers;
 };
 typedef struct IRC(_session) IRC(Ses);
 typedef struct IRC(_session) IRC(Session);

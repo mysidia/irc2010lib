@@ -222,28 +222,28 @@ const char *IrcChanHkeyPred(void *item) {
 	return ((IrcChannel *)item)->channelName->name;
 }
 
-void IrcAddChannel ( ilHashTable **chanHash, IrcChannel *cl )
+void IrcAddChannel ( ircHashTable **chanHash, IrcChannel *cl )
 {
 	if (*chanHash == 0) {
-		*chanHash = ilNewHashTable(256, IrcChanHkeyPred);
+		*chanHash = ircNewHashTable(256, IrcChanHkeyPred);
 		if (*chanHash == 0) {
 			fprintf(stderr, "FATAL: Resources exhausted\n");
 			exit(11);
 		}
 	}
-	ilHashAdd(*chanHash, cl);
+	ircHashAdd(*chanHash, cl);
 }
 
-IrcChannel *IrcFindChannel ( ilHashTable **chanHash, IRC(ChannelName) *cn )
+IrcChannel *IrcFindChannel ( ircHashTable **chanHash, IRC(ChannelName) *cn )
 {
 	if (*chanHash == 0)
 		return 0;
-	return ilHashFind(*chanHash, cn->name);
+	return ircHashFind(*chanHash, cn->name);
 }
 
-void IrcDelChannel ( ilHashTable **chanHash, IrcChannel *cl )
+void IrcDelChannel ( ircHashTable **chanHash, IrcChannel *cl )
 {
-	int z = ilHashDel(*chanHash, cl);
+	int z = ircHashDel(*chanHash, cl);
 
 	if ( z == 0 )
 		abort();
