@@ -31,7 +31,7 @@
 #include "irclib.h"
 #include "dns.h"
 
-ID("$Id: irc.c,v 1.12 2002/01/30 02:30:48 mysidia Exp $");
+ID("$Id: irc.c,v 1.13 2002/04/10 22:01:37 mysidia Exp $");
 time_t CTime;
 
 /**
@@ -130,4 +130,5 @@ void IRC(MakeMessage)(IRC(Message)*mb, char *buf)
 	}
 
 	mb->numarg = i;
-} /**/
+}
+
