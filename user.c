@@ -29,8 +29,8 @@
  */
 
 #include "irclib.h"
-#include "nick.h"
-ID("$Id: user.c,v 1.1 2004/03/17 18:43:27 mysidia Exp $");
+#include "user.h"
+ID("$Id: user.c,v 1.2 2004/03/17 19:23:26 mysidia Exp $");
 
 /*
  *  Will soon add routines to manipulate user structures

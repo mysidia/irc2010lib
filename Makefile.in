@@ -51,7 +51,7 @@ CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
 
-# $Id: Makefile.in,v 1.23 2004/03/17 18:43:27 mysidia Exp $
+# $Id: Makefile.in,v 1.24 2004/03/17 19:23:26 mysidia Exp $
 #
 #
 DEFS = -D_IRCLIB_INTERNAL @DEFS@

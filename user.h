@@ -45,7 +45,7 @@ struct _nickname
 {
 	char	*namp;
 };
-typedef struct _channame IRC(NickName);
+typedef struct _nickname IRC(NickName);
 
 struct _userhandle
 {
@@ -55,12 +55,6 @@ struct _userhandle
 	long			modes[2];
 };
 typedef struct _chanhandle IrcUser;
-
-struct _chanuser
-{
-	int flags;
-//	IRC(NickName)		nick;
-};
 
 /*void IrcAddChannel ( struct _irc_hash_table**, IrcChannel *cl );
 IrcChannel *IrcFindChannel ( struct _irc_hash_table**, IRC(ChannelName) *cn );
