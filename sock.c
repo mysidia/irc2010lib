@@ -26,7 +26,6 @@
 
 #include "irclib.h"
 #include <stddef.h>
-#include <event.h>
 
 void IrcLibEventSocket(int fd, short evType, void *p);
 void IrcLibEventListener(int fd, short evType, void *p);
@@ -81,14 +80,19 @@ IrcSocket *LibIrc_socket_make()
 
 void IrcLibdelCon(IrcSocket *q)
 {
+	LIST_REMOVE(q, socket_list);
+//	LibIrcSocketDelEvents(q);
 }
 
 void IrcLibFreeSocket(IrcSocket *q)
 {
+	free(q);
 }
 
 void IrcLibAddCon(IrcListener *li, IrcSocket *q)
 {
+	LIST_INSERT_HEAD(&(li->links), q, socket_list);
+	LibIrcSocketAddEvents(q);
 }
 
 
@@ -132,26 +136,39 @@ IrcListener *LibIrc_socket_listen(IrcSocket *theSocket)
 	return port;
 }
 
-void LibIrcSocketAddevents(IrcSocket *theSocket)
+void LibIrcSocketAddEvents(IrcSocket *theSocket)
 {
-	struct event *p = oalloc(sizeof(struct event));
+	struct event *p;
+	int foundRead = 0, foundWrite = 0;
+
+	if (theSocket->theEvent == NULL)
+		p = oalloc(sizeof(struct event));
+	else {
+		p = theSocket->theEvent;
+		event_del(p);
+	}
 
 	event_set(p, theSocket->fd, EV_READ, IrcLibEventSocket, theSocket);
-	event_add(p, NULL);
 
 	if ((theSocket->flags & IRCSOCK_WRITE) == 0)
-	{
-		event_set(p, theSocket->fd, EV_WRITE, IrcLibEventSockWrite, theSocket);
-		event_add(p, NULL);
-	}
+		event_set(p, theSocket->fd, EV_READ | EV_WRITE, IrcLibEventSockWrite, theSocket);
+
+	event_add(p, NULL);
+	theSocket->theEvent = p;
 }
 
-void LibIrcListenerAddevents(IrcListener *thePort)
+void LibIrcListenerAddEvents(IrcListener *thePort)
 {
-	struct event *p = oalloc(sizeof(struct event));
+	struct event *p; 
+
+	if (thePort->sock->theEvent == NULL)
+		p = oalloc(sizeof(struct event));
+	else {
+		p = thePort->sock->theEvent;
+		event_del(p);
+	}
 
 	event_set(p, thePort->sock->fd, EV_READ, IrcLibEventListener, thePort);
-
 	event_add(p, NULL);
 }
 
@@ -235,7 +252,7 @@ IrcLibEventListener(int fd, short evType, void *vI)
 			close(pFd);
 	}
 
-	LibIrcListenerAddevents(li);
+	LibIrcListenerAddEvents(li);
 }
 
 
@@ -261,7 +278,7 @@ IrcLibEventSocket(int fd, short evType, void *p)
 		// For now just flush out the buffer
 	}
 
-	LibIrcSocketAddevents(q);
+	LibIrcSocketAddEvents(q);
 }
 
 /**

@@ -92,6 +92,8 @@
 #include <arpa/inet.h>
 #endif
 
+#include <event.h>
+
 int match(const char*, const char*);
 void *oalloc(size_t);
 
@@ -114,11 +116,13 @@ struct _ircbf
 typedef struct _ircbf IrcBuf;
 typedef struct _ircbf IrcLibSocketBuf;
 
+
 struct _ircsocket
 {
 #ifdef _IRCLIB
 	int fd;
 	int flags;
+	struct event *theEvent;
 	struct in_addr addr;
 
 	IrcLibSocketBuf inBuf;
@@ -126,6 +130,7 @@ struct _ircsocket
 #else
 	char __fd__[INTBITS];
 	char __flags__[INTBITS];
+	char __event__[sizeof(struct event *)];
 	char __addr__[sizeof(struct in_addr)];
 	char __inbuf__[sizeof(IrcLibSocketBuf)];
 	char __outbuf__[sizeof(IrcLibSocketBuf)];
@@ -140,15 +145,15 @@ typedef struct
 	int topFd;
 
 	IrcSocket *sock;
-	LIST_HEAD(, _socket)	links;
+	LIST_HEAD(, _ircsocket)	links;
 } IrcListener;
 
 int LibIrcSockNonBlock(int listenDesc);
 IrcSocket *LibIrc_socket_make();
 int LibIrc_socket_bind(IrcSocket *theSocket, int portNum, struct in_addr addr);
 IrcListener *LibIrc_socket_listen(IrcSocket *theSocket);
-void LibIrcSocketAddevents(IrcSocket *theSocket);
-void LibIrcListenerAddevents(IrcListener *);
+void LibIrcSocketAddEvents(IrcSocket *theSocket);
+void LibIrcListenerAddEvents(IrcListener *);
 
 int IrcLibReadPackets(IrcSocket *ptrLink);
 void IrcLibEventListener(int fd, short evType, void *p);

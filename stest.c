@@ -22,7 +22,7 @@ int main()
 		abort();
 	printf("Listening on %d\n", 3030);
 
-	LibIrcListenerAddevents(q);
+	LibIrcListenerAddEvents(q);
 	
 	LibIrcSystemLoop();
 
