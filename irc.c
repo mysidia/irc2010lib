@@ -31,7 +31,7 @@
 #include "irclib.h"
 #include "dns.h"
 
-ID("$Id: irc.c,v 1.9 2001/11/17 03:50:12 mysidia Exp $");
+ID("$Id: irc.c,v 1.10 2001/11/17 03:59:13 mysidia Exp $");
 time_t CTime;
 
 void LibIrcInit()
@@ -79,9 +79,12 @@ void IRC(MakeMessage)(IRC(Message)*mb, char *buf)
 
 			if (*p == '\0')
 				break;
+			m = p;
 
 			while(*p && isspace(*p))
 				p++;
+			m[0] = '\0';
+
 			m = p;
 			m[-1] = '\0';
 
@@ -95,6 +98,7 @@ void IRC(MakeMessage)(IRC(Message)*mb, char *buf)
 				done = 1;
 			else
 				prefix = 1;
+			m = ++p;
 		}
 
 		while (*p && ( done || isspace(*p) == 0 ))
