@@ -59,6 +59,22 @@ ilHashTable *ilRehashTable(ilHashTable *ht, int newsize) {
 }
 
 ilHashTable *ilEmptyHashTable(ilHashTable *ht) {
+	struct _irc_hash_entry* hx;
+	int i = 0;
+
+	if (ht->table)
+		for(i = 0; i < ht->size; i++) {
+			if (ht->table[i] != 0) {
+				while(ht->table[i]->first) {
+					hx = ht->table[i]->first;
+					ht->table[i]->first = hx->next;
+					free(hx);
+				}
+
+				free(ht->table[i]);
+			}
+		}
+	
 }
 
 ilHashTable *ilFreeHashTable(ilHashTable *ht) {
