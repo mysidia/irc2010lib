@@ -115,7 +115,6 @@ char *str_dup(const char *);
 #define HOSTLEN		63
 #define USERLEN		8
 
-
 #define IRCSOCK_BOUND		0x1
 #define IRCSOCK_LISTEN		0x2
 #define IRCSOCK_INCONN		0x4
@@ -123,6 +122,9 @@ char *str_dup(const char *);
 #define IRCSOCK_WRITE		0x10
 #define IRCSOCK_INBOUND		0x20
 
+/**
+ * Irc socket message buffers
+ */
 struct _ircbf
 {
         struct _ircbq *firstEls, *lastEls;
@@ -132,6 +134,9 @@ typedef struct _ircbf IrcBuf;
 typedef struct _ircbf IrcLibSocketBuf;
 
 
+/**
+ * An IRC Connection endpoint
+ */
 struct _ircsocket
 {
 #ifdef _IRCLIB
@@ -166,6 +171,9 @@ struct _ircsocket
 
 typedef struct _ircsocket IRC(Socket);
 
+/**
+ * An IRC Listener
+ */
 struct _irclistener
 {
 	int topFd;
@@ -176,6 +184,9 @@ struct _irclistener
 typedef struct _irclistener IRC(Listener);
 
 
+/**
+ * An outbound(?) IRC Connection
+ */
 struct _irccon
 {
 };

@@ -9,6 +9,9 @@ struct _dnsquery;
 
 typedef int DnsCallBack (struct _dnsquery*, char *result, void *data);
 
+/**
+ * An internal DNS callback entry
+ */
 struct _dnscallent {
 	void *data;
 	DnsCallBack *func;
@@ -16,6 +19,9 @@ struct _dnscallent {
 };
 
 
+/**
+ * A DNS query that is pending
+ */
 struct _dnsquery
 {
 	adns_query query;
