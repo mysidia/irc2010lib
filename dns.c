@@ -53,7 +53,7 @@ char *ip2ptr(char *host)
     return buf;
 }
 
-int query_dns(char *host)
+int query_dns(char *host, DnsCallBack *func)
 {
 	IRC(dns_query) *query;
 
