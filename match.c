@@ -29,7 +29,7 @@
  */
 
 #include "irclib.h"
-ID("$Id: match.c,v 1.3 2001/10/25 04:30:13 mysidia Exp $");
+ID("$Id: match.c,v 1.4 2004/03/28 07:59:14 mysidia Exp $");
 
 /**
  *  \fn int match(const char *mask, const char *string)
@@ -56,7 +56,7 @@ ID("$Id: match.c,v 1.3 2001/10/25 04:30:13 mysidia Exp $");
  */
 
 int
-IRC(match)(const char *mask, const char *string)
+Ircmatch(const char *mask, const char *string)
 {
         const char  *m = mask,
                 *n = string,

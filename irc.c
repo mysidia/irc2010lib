@@ -31,7 +31,7 @@
 #include "irclib.h"
 #include "dns.h"
 
-ID("$Id: irc.c,v 1.14 2004/03/11 22:09:11 mysidia Exp $");
+ID("$Id: irc.c,v 1.15 2004/03/28 07:59:14 mysidia Exp $");
 time_t CTime;
 
 /**
@@ -40,13 +40,13 @@ time_t CTime;
 void LibIrcInit()
 {
 	event_init();		/* Init event system */
-	IRC(dns_init)();	/* Init dns system */
+	Ircdns_init();	/* Init dns system */
 }
 
 /**
  * @brief The system event loop
  */
-int IRC(SystemLoop)()
+int IrcSystemLoop()
 {
 	CTime = time(NULL);
 
@@ -64,7 +64,7 @@ int IRC(SystemLoop)()
  * \param buf Buffer to split along spaces, : after space or MAXPARA
  * parameters so far signals end of command/argument splitting
  */
-void IRC(MakeMessage)(IRC(Message)*mb, char *buf)
+void IrcMakeMessage(IrcMessage* mb, char *buf)
 {
 	char *p, *m;
 	int i, done = 0, prefix = 0;

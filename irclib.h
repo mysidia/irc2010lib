@@ -122,7 +122,7 @@ void *oalloc(size_t);
 char *str_dup(const char *);
 void str_free(char *s);
 
-struct IRC(_Message);
+struct Irc_Message;
 struct _ircsocket;
 
 #define SOCKBUFSIZE 1024
@@ -163,13 +163,13 @@ typedef struct _ircbf IrcLibSocketBuf;
 		type _##__LINE__##_##var##__ [ne]
 #endif
 
-struct IRC(_MsgTab)
+struct Irc_MsgTab
 {
 	const char *name;
-	int (* handler)(struct _ircsocket*, struct IRC(_Message)*);
+	int (* handler)(struct _ircsocket*, struct Irc_Message*);
 };
 
-typedef struct IRC(_MsgTab) IRC(MsgTab);
+typedef struct Irc_MsgTab IrcMsgTab;
 
 /**
  * An IRC Connection endpoint
@@ -187,7 +187,7 @@ struct _ircsocket
 	PRIV_MEM(struct _ircTimer,	timer,		1);
 	PRIV_MEM(void*,			exData,		1);
 
-	IRC(MsgTab)	*parser;
+	IrcMsgTab	*parser;
 
 	time_t lasttime;
 	struct _irclistener *port;
@@ -200,7 +200,7 @@ struct _ircsocket
 	LIST_HEAD(, ircTimer)	timers;
 };
 
-typedef struct _ircsocket IRC(Socket);
+typedef struct _ircsocket IrcSocket;
 
 /**
  * An IRC Listener
@@ -209,10 +209,10 @@ struct _irclistener
 {
 	int topFd;
 
-	IRC(Socket) *sock;
+	IrcSocket *sock;
 	LIST_HEAD(, _ircsocket)	links;
 }; 
-typedef struct _irclistener IRC(Listener);
+typedef struct _irclistener IrcListener;
 
 
 /**
@@ -222,29 +222,29 @@ struct _irccon
 {
 };
 
-struct IRC(_Message)
+struct Irc_Message
 {
 	int numarg;
 	char *prefix;
 	char *command;
 	char *args[IRC_MAXARGS];
 };
-typedef struct IRC(_Message) IRC(Message);
+typedef struct Irc_Message IrcMessage;
 
-int IRC(SockNonBlock) (int listenDesc);
-IRC(Socket) *IRC(socket_make)();
-int IRC(socket_bind)(IRC(Socket) *theSocket, int portNum, struct in_addr addr);
-IRC(Listener) *IRC(MakeListener)(IRC(Socket) *theSocket);
-void IRC(SocketAddEvents)(IRC(Socket) *theSocket);
-void IRC(ListenerAddEvents)(IRC(Listener) *);
+int IrcSockNonBlock (int listenDesc);
+IrcSocket *Ircsocket_make();
+int Ircsocket_bind(IrcSocket *theSocket, int portNum, struct in_addr addr);
+IrcListener *IrcMakeListener(IrcSocket *theSocket);
+void IrcSocketAddEvents(IrcSocket *theSocket);
+void IrcListenerAddEvents(IrcListener *);
 
-int IrcLibReadPackets(IRC(Socket) *ptrLink);
-int IrcLibReadBinary(IRC(Socket) *ptrLink);
+int IrcLibReadPackets(IrcSocket *ptrLink);
+int IrcLibReadBinary(IrcSocket *ptrLink);
 void IrcLibEventListener(int fd, short evType, void *p);
 void IrcLibEventSocket(int fd, short evType, void *p);
 void IrcLibEventFlushSockets(int fd, short evType, void *p);
-char *IRC(BufShove)(IrcBuf *t, char *textIn, size_t textLen);
-int IRC(BufDeQueue)(IrcBuf *t, char cmd[IRCBUFSIZE], int);
+char *IrcBufShove(IrcBuf *t, char *textIn, size_t textLen);
+int IrcBufDeQueue(IrcBuf *t, char cmd[IRCBUFSIZE], int);
 int IrcLibBufIsEmpty(IrcBuf *t);
 void IrcBufMakeEmpty(IrcBuf *t);
 char *IrcLibBufShoveBinary(IrcBuf *t, char* text, size_t len);
@@ -252,25 +252,25 @@ void IrcSetSockHandler(struct _ircsocket *q, int (* newFunc)(struct _ircsocket*,
 
 
 void LibIrcInit();
-int IRC(SystemLoop)();
-void IrcSend(IRC(Socket) *, const char *, ...);
-int IrcLibDefaultSockHandler(IRC(Socket) *, char *);
-int IrcLibDefaultListenHandler(IRC(Socket) *, char *);
-int IrcLibDefaultClientHandler(IRC(Socket) *, char *);
+int IrcSystemLoop();
+void IrcSend(IrcSocket *, const char *, ...);
+int IrcLibDefaultSockHandler(IrcSocket *, char *);
+int IrcLibDefaultListenHandler(IrcSocket *, char *);
+int IrcLibDefaultClientHandler(IrcSocket *, char *);
 
-void IRC(socket_connect)
-	(IRC(Socket)*, int port, struct in_addr, int (*)(IRC(Socket) *, int));
+void Ircsocket_connect
+	(IrcSocket*, int port, struct in_addr, int (*)(IrcSocket *, int));
 
-int IRC(match)(const char *mask, const char *string);
+int Ircmatch(const char *mask, const char *string);
 
-void IRC(MakeMessage)(IRC(Message)*, char*);
+void IrcMakeMessage(IrcMessage*, char*);
 
 extern time_t CTime;
 
 #define IrcLibPop	IrcLib_pop
-#define IrcListener	IRC(Listener)
-#define IrcSocket	IRC(Socket)
-#define IrcDnsQuery	IRC(dns_query)
+#define IrcListener	IrcListener
+#define IrcSocket	IrcSocket
+#define IrcDnsQuery	Ircdns_query
 
 #ifndef __IDSTRING
 
@@ -293,18 +293,18 @@ extern time_t CTime;
 #	define __USEVAR(s) __IDSTRING(s, "(null)")
 #endif
 
-struct IRC(_modemap_st)
+struct Irc_modemap_st
 {
 	int inuse, takes_arg;
 };
 
-struct IRC(_session)
+struct Irc_session
 {
-	IRC(Socket) *sock;		/* Daemon socket */
+	IrcSocket *sock;		/* Daemon socket */
 	ircHashTable *chanHash;	/* Channels */
-	struct IRC(_modemap_st) modemap[NUM_MODES + 1];
+	struct Irc_modemap_st modemap[NUM_MODES + 1];
 	LIST_HEAD(, ircTimer)	timers;
 };
-typedef struct IRC(_session) IRC(Ses);
-typedef struct IRC(_session) IRC(Session);
-typedef struct IRC(_modemap_st) IrcModeMap;
+typedef struct Irc_session IrcSes;
+typedef struct Irc_session IrcSession;
+typedef struct Irc_modemap_st IrcModeMap;

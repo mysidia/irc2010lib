@@ -20,7 +20,7 @@
 #include "irclib.h"
 #include "dns.h"
 #include <assert.h>
-ID("$Id: ctest.c,v 1.3 2004/03/17 18:32:10 mysidia Exp $");
+ID("$Id: ctest.c,v 1.4 2004/03/28 07:59:14 mysidia Exp $");
 
 int Test(IrcSocket *cl)
 {
@@ -58,23 +58,23 @@ int conDone(IrcSocket* sock, int errcode )
 
 int main()
 {
-	IRC(Socket) *testCli;
+	IrcSocket *testCli;
 	struct in_addr addr;
 
 	LibIrcInit();
-	testCli = IRC(socket_make)();
+	testCli = Ircsocket_make();
 
 	if (testCli == NULL)
 		abort();
 
 	addr.s_addr = INADDR_ANY;
 
-	if (IRC(socket_bind)(testCli, 0, addr) < 0)
+	if (Ircsocket_bind(testCli, 0, addr) < 0)
 		abort();
 	query_dns(0, "localhost", funFin, NULL);
 
 	addr.s_addr = inet_addr("127.0.0.1");
-	IRC(socket_connect)(testCli, 3030, addr, conDone);
+	Ircsocket_connect(testCli, 3030, addr, conDone);
 
-	IRC(SystemLoop)();
+	IrcSystemLoop();
 }

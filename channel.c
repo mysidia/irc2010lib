@@ -35,41 +35,41 @@
 
 /**********************************************************************/
 
-char * IRC(ChanCgetName) (IRC(ChannelName) *cn)
+char * IrcChanCgetName (IrcChannelName *cn)
 {
 	return ( cn )->name;
 }
 
-char * IRC(ChanGetName) (IrcChannel* cn)
+char * IrcChanGetName (IrcChannel* cn)
 {
 	return ( ( cn )->channelName )->name;
 }
 
-const char * IRC(ChanVoidPtrHashableName) (void* cn)
+const char * IrcChanVoidPtrHashableName (void* cn)
 {
 	return ( ((IrcChannel *) cn )->channelName )->name;
 }
 
 
-const IRC(ChannelName) IRC(ChanMakeTempName) (const char *name)
+const IrcChannelName IrcChanMakeTempName (const char *name)
 {
-	IRC(ChannelName) tmp;
+	IrcChannelName tmp;
 
 	tmp.name = (char *)name;
 	return tmp;
 }
 
-IRC(ChannelName)* IRC(ChanMakeName) (const char *name)
+IrcChannelName* IrcChanMakeName (const char *name)
 {
-	IRC(ChannelName) *tmp;
+	IrcChannelName *tmp;
 
-	tmp = oalloc(sizeof(IRC(ChannelName)));
+	tmp = oalloc(sizeof(IrcChannelName));
 	( tmp )->name = str_dup(name);
 
 	return tmp;
 }
 
-void IRC(ChanFreeName) (IRC(ChannelName) *p)
+void IrcChanFreeName (IrcChannelName *p)
 {
 	if (( p )->name)
 		free(p->name);
@@ -79,7 +79,7 @@ void IRC(ChanFreeName) (IRC(ChannelName) *p)
 /**
  * Update name ptr
  */
-void IRC(ChanCsetName) (IRC(ChannelName) *cn, const char *str)
+void IrcChanCsetName (IrcChannelName *cn, const char *str)
 {
 	if ( ( cn )->name )
 		free (( cn )->name);
@@ -90,29 +90,29 @@ void IRC(ChanCsetName) (IRC(ChannelName) *cn, const char *str)
 		cn->name = NULL;
 }
 
-void IRC(ChanJoin) (IRC(Ses)so, IRC(ChannelName) *chan_name)
+void IrcChanJoin (IrcSes so, IrcChannelName *chan_name)
 {
-	IrcSend(so.sock, "JOIN %s" IEOL, IRC(ChanCgetName)(chan_name));
+	IrcSend(so.sock, "JOIN %s" IEOL, IrcChanCgetName(chan_name));
 }
 
-void IRC(ChanPart) (IRC(Ses)so, IRC(ChannelName) *chan_name)
+void IrcChanPart (IrcSes so, IrcChannelName *chan_name)
 {
-	IrcSend(so.sock, "PART %s" IEOL, IRC(ChanCgetName)(chan_name));
+	IrcSend(so.sock, "PART %s" IEOL, IrcChanCgetName(chan_name));
 }
 
-//void IRC(ChanAddUser) ( IRC(Channel)* cl, IRC(User)* us )
+//void IrcChanAddUser ( IrcChannel* cl, IrcUser* us )
 //{
 //}
 
-//void IRC(SendAddBan) (IRC(ChannelName) *chan_name, IRC(ChannelBan) *bNew)
-//void IRC(SendDelBan) (IRC(ChannelName) *chan_name, IRC(ChannelBan) *bOld)
+//void IrcSendAddBan (IrcChannelName *chan_name, IrcChannelBan *bNew)
+//void IrcSendDelBan (IrcChannelName *chan_name, IrcChannelBan *bOld)
 
-//void IRC(SendCUserModePlus) (IRC(ChannelName) *chan_name, IRC(ChannelUser) *opNew, IRC(ChannelMode) toAdd)
-//void IRC(SendCUserModeLess) (IRC(ChannelName) *chan_name, IRC(ChannelUser) *opOld, IRC(ChannelMode) toDel)
+//void IrcSendCUserModePlus (IrcChannelName *chan_name, IrcChannelUser *opNew, IrcChannelMode toAdd)
+//void IrcSendCUserModeLess (IrcChannelName *chan_name, IrcChannelUser *opOld, IrcChannelMode toDel)
 
-//void IRC(SendKick) (IRC(ChannelName) *chan_name, IRC(ChannelUser) *target);
-//void IRC(SendInvite) (IRC(ChannelName) *chan_name, IRC(NickName) *target);
-//BanMask* IRC(GetBanMask) (IRC(UserHost) *a) 
+//void IrcSendKick (IrcChannelName *chan_name, IrcChannelUser *target);
+//void IrcSendInvite (IrcChannelName *chan_name, IrcNickName *target);
+//BanMask* IrcGetBanMask (IrcUserHost *a) 
 
 /**********************************************************************/
 
@@ -182,7 +182,7 @@ IrcChannelMode IrcLibFlagToMode(char flag)
 	return mode;
 }
 
-void IrcLibModeSetMode(IRC(Session)* ses, IrcChannelMode *q, const char *flagsToSet,
+void IrcLibModeSetMode(IrcSession* ses, IrcChannelMode *q, const char *flagsToSet,
 	const char *para[], int paraArgc,
 	int (* paramHandler)(char mode, const char *))
 {
@@ -253,7 +253,7 @@ void IrcAddChannel ( ircHashTable **chanHash, IrcChannel *cl )
 	ircHashAdd(*chanHash, cl);
 }
 
-IrcChannel *IrcFindChannel ( ircHashTable **chanHash, IRC(ChannelName) *cn )
+IrcChannel *IrcFindChannel ( ircHashTable **chanHash, IrcChannelName *cn )
 {
 	if (*chanHash == 0)
 		return 0;
@@ -268,11 +268,11 @@ void IrcDelChannel ( ircHashTable **chanHash, IrcChannel *cl )
 		abort();
 }
 
-void IRC(SendModeChange) (
-			  IRC(Ses) so, 
-			  IRC(ChannelName) *chan_name,
-			  IRC(ChannelMode) orig,
-                          IRC(ChannelMode) newmode
+void IrcSendModeChange (
+			  IrcSes so, 
+			  IrcChannelName *chan_name,
+			  IrcChannelMode orig,
+                          IrcChannelMode newmode
 )
 {
 	char buf[512], tmp[2];
@@ -315,8 +315,7 @@ void IRC(SendModeChange) (
 	}
 
 	// IrcModeBitMap[].mask1  mask2   fl(letter)
-	IrcSend(so.sock, "MODE %s %s" IEOL, IRC(ChanCgetName)(chan_name),
-		buf);
+	IrcSend(so.sock, "MODE %s %s" IEOL, IrcChanCgetName(chan_name), buf);
 }
 
 /********************************************************************/

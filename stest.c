@@ -18,7 +18,7 @@
 #include "irclib.h"
 #include "dns.h"
 #include <assert.h>
-ID("$Id: stest.c,v 1.15 2004/03/17 18:32:10 mysidia Exp $");
+ID("$Id: stest.c,v 1.16 2004/03/28 07:59:14 mysidia Exp $");
 
 IrcSocket *testCli;
 
@@ -58,25 +58,25 @@ int conDone( IrcSocket *sock, int errcode )
 
 int main()
 {
-	IRC(Socket) *p;
-	IRC(Listener) *q;
+	IrcSocket *p;
+	IrcListener *q;
 	struct in_addr addr;
 
 	LibIrcInit();
-	p = IRC(socket_make)();
+	p = Ircsocket_make();
 
 	if (p == NULL)
 		abort();
 
 	addr.s_addr = INADDR_ANY;
 
-	if (IRC(socket_bind)(p, 3030, addr) < 0)
+	if (Ircsocket_bind(p, 3030, addr) < 0)
 		abort();
-	if ((q = IRC(MakeListener)(p)) == NULL)
+	if ((q = IrcMakeListener(p) == NULL))
 		abort();
 	printf("Listening on %d\n", 3030);
 
-	IRC(ListenerAddEvents)(q);
+	IrcListenerAddEvents(q);
 
 	q->sock->periodic = Test; /* periodically Test(...) */
 
@@ -84,7 +84,7 @@ int main()
 
 	query_dns(0, "rs.internic.net", funFin, NULL); /* test DNS */
 
-	IRC(SystemLoop)();
+	IrcSystemLoop();
 
 //	sleep (6000);
 }

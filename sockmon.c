@@ -18,9 +18,9 @@
 #include "irclib.h"
 #include "dns.h"
 #include <assert.h>
-ID("$Id: sockmon.c,v 1.2 2002/01/30 02:30:48 mysidia Exp $");
+ID("$Id: sockmon.c,v 1.3 2004/03/28 07:59:14 mysidia Exp $");
 
-IRC(Socket) *testCli;
+IrcSocket *testCli;
 
 int readSocks(IrcSocket *cl, char *buf)
 {
@@ -64,7 +64,7 @@ int incomingSocks(IrcSocket *cl, char *buf)
 	cl->readFunc = IrcLibReadBinary;
 }
 
-int conDone( IRC(Socket) * sock, int errcode )
+int conDone( IrcSocket * sock, int errcode )
 {
 	if (errcode)
 		printf("Connection %d\n", errcode);
@@ -74,12 +74,12 @@ int conDone( IRC(Socket) * sock, int errcode )
 
 int main()
 {
-	IRC(Socket) *p;
-	IRC(Listener) *q;
+	IrcSocket *p;
+	IrcListener *q;
 	struct in_addr addr;
 
 	LibIrcInit();
-	p = IRC(socket_make)();
+	p = Ircsocket_make();
 	p->readFunc = IrcLibReadBinary;
 
 	if (p == NULL)
@@ -87,19 +87,19 @@ int main()
 
 	addr.s_addr = INADDR_ANY;
 
-	if (IRC(socket_bind)(p, 1080, addr) < 0)
+	if (Ircsocket_bind(p, 1080, addr) < 0)
 		abort();
-	if ((q = IRC(MakeListener)(p)) == NULL)
+	if ((q = IrcMakeListener(p)) == NULL)
 		abort();
 	printf("Listening on %d\n", 1080);
 
-	IRC(ListenerAddEvents)(q);
+	IrcListenerAddEvents(q);
 
 	q->sock->func = incomingSocks;
 
 	addr.s_addr = inet_addr("127.0.0.1");
 
-	IRC(SystemLoop)();
+	IrcSystemLoop();
 
 //	sleep (6000);
 }

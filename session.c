@@ -34,17 +34,17 @@
 #include "irclib.h"
 #include "channel.h"
 
-ID("$Id: session.c,v 1.1 2004/03/28 07:39:48 mysidia Exp $");
+ID("$Id: session.c,v 1.2 2004/03/28 07:59:14 mysidia Exp $");
 
 /**
  * Create a session
  */
-IRC(Session)* irc_session_make()
+IrcSession* irc_session_make()
 {
-	IRC(Session)* ses = (IRC(Session) *)oalloc(sizeof(IRC(Session)));
+	IrcSession* ses = (IrcSession *)oalloc(sizeof(IrcSession));
 
 	LIST_INIT(&ses->timers);
 	memset(ses->modemap, 0, sizeof(ses->modemap));
-	ses->chanHash = ilNewHashTable(DEFCHANHASHSIZE, IRC(ChanVoidPtrHashableName));
+	ses->chanHash = ilNewHashTable(DEFCHANHASHSIZE, IrcChanVoidPtrHashableName);
 	ses->sock = NULL;
 }

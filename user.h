@@ -45,18 +45,18 @@ struct _nickname
 {
 	char	*namp;
 };
-typedef struct _nickname IRC(NickName);
+typedef struct _nickname IrcNickName;
 
 struct _userhandle
 {
 	LIST_HEAD(,_chanhandle)	*channels;
-	IRC(NickName)		nick;
+	IrcNickName		nick;
 	time_t			login;
 	long			modes[2];
 };
 typedef struct _chanhandle IrcUser;
 
 /*void IrcAddChannel ( struct _irc_hash_table**, IrcChannel *cl );
-IrcChannel *IrcFindChannel ( struct _irc_hash_table**, IRC(ChannelName) *cn );
+IrcChannel *IrcFindChannel ( struct _irc_hash_table**, IrcChannelName *cn );
 void IrcDelChannel ( struct _irc_hash_table**, IrcChannel *cl );*/
 #endif

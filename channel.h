@@ -50,19 +50,18 @@ struct _chanmode
 	char paramCount;
 };
 typedef struct _chanmode IrcChannelMode;
-typedef struct _chanmode IRC(ChannelMode);
 
 
 struct _channame
 {
 	char	*name;
 };
-typedef struct _channame IRC(ChannelName);
+typedef struct _channame IrcChannelName;
 
 struct _chanhandle
 {
 	LIST_HEAD(,_chanuser)	*users;
-	IRC(ChannelName)	*channelName;
+	IrcChannelName	*channelName;
 	time_t			created;
 	time_t			lastTime;
 	IrcChannelMode		mode;
@@ -72,15 +71,15 @@ typedef struct _chanhandle IrcChannel;
 struct _chanuser
 {
 	int flags;
-//	IRC(NickName)		nick;
+//	IrcNickName		nick;
 };
 
 void IrcAddChannel ( struct _irc_hash_table**, IrcChannel *cl );
-IrcChannel *IrcFindChannel ( struct _irc_hash_table**, IRC(ChannelName) *cn );
+IrcChannel *IrcFindChannel ( struct _irc_hash_table**, IrcChannelName *cn );
 void IrcDelChannel ( struct _irc_hash_table**, IrcChannel *cl );
-char * IRC(ChanCgetName) (IRC(ChannelName) *cn);
-char * IRC(ChanGetName) (IrcChannel* cn);
-const char * IRC(ChanVoidPtrHashableName) (void* cn);
+char * IrcChanCgetName (IrcChannelName *cn);
+char * IrcChanGetName (IrcChannel* cn);
+const char * IrcChanVoidPtrHashableName (void* cn);
 
 
 

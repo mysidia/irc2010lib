@@ -32,7 +32,7 @@
 #define __dns_h__
 #include <adns.h>
 
-void IRC(dns_init)();
+void Ircdns_init();
 
 struct _dnscallent;
 struct _dnsquery;
@@ -62,8 +62,8 @@ struct _dnsquery
 	LIST_ENTRY(_dnsquery) query_lst;
 };
 
-typedef struct _dnsquery IRC(dns_query);
-typedef struct _dnscallent IRC(dns_call);
+typedef struct _dnsquery Ircdns_query;
+typedef struct _dnscallent Ircdns_call;
 
 
 int query_dns(int rev, char *, DnsCallBack*, void *);

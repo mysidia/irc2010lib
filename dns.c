@@ -30,7 +30,7 @@
 
 #include "irclib.h"
 #include "dns.h"
-ID("$Id: dns.c,v 1.11 2001/12/16 10:01:44 mysidia Exp $");
+ID("$Id: dns.c,v 1.12 2004/03/28 07:59:14 mysidia Exp $");
 
 static adns_state dns_state;
 static LIST_HEAD(, _dnsquery) queries;
@@ -41,7 +41,7 @@ static void check_dns();
 /**
  * @brief Initialize dns queue/checks/events
  */
-void IRC(dns_init)()
+void Ircdns_init()
 {
 	int errv;
 
@@ -98,8 +98,8 @@ static char *ip2ptr(char *host)
  */
 int query_dns(int reverse, char *host, DnsCallBack *func, void *data)
 {
-	IRC(dns_query) *query;
-	IRC(dns_call) *newCall;
+	Ircdns_query *query;
+	Ircdns_call *newCall;
 	int found = 0;
 
 	if (!host || !*host)
@@ -114,10 +114,10 @@ int query_dns(int reverse, char *host, DnsCallBack *func, void *data)
 
 	do {
 		if (found == 0)
-			query = oalloc(sizeof(IRC(dns_query)));
+			query = oalloc(sizeof(Ircdns_query));
 
 		if (query) {
-			newCall = oalloc(sizeof(IRC(dns_call)));
+			newCall = oalloc(sizeof(Ircdns_call));
 			newCall->func = func;
 			newCall->data = data;
 			LIST_INSERT_HEAD(&query->calls, newCall, call_lst);
@@ -162,8 +162,8 @@ static void check_dns()
 	int         v = 0;
 	struct descriptor_data *d;
 
-	IRC(dns_query) *req, *req_next;
-	IRC(dns_call) *call, *call_next;
+	Ircdns_query *req, *req_next;
+	Ircdns_call *call, *call_next;
 	int found = 0;
 
 	for(req = queries.lh_first; req; req = req_next)

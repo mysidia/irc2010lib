@@ -31,19 +31,19 @@
 #include "irclib.h"
 #include <stddef.h>
 
-ID("$Id: sock.c,v 1.33 2003/01/15 18:19:08 mysidia Exp $");
+ID("$Id: sock.c,v 1.34 2004/03/28 07:59:14 mysidia Exp $");
 
 void IrcLibEventSocket(int fd, short evType, void *p);
 void IrcLibEventListener(int fd, short evType, void *p);
 void IrcLibEventSockWrite(int fd, short evType, void *p);
 
-int IRCUnknown(IRC(Socket)*q, IRC(Message)*t)
+int IRCUnknown(IrcSocket* q, IrcMessage* t)
 {
 	if (t->command)
 		IrcSend(q, "Unknown: [%s]\r\n", t->command);
 }
 
-IRC(MsgTab) IrcLibDefaultClientTable[] =
+IrcMsgTab IrcLibDefaultClientTable[] =
 {
 	{ NULL, IRCUnknown }
 };
@@ -77,7 +77,7 @@ int LibIrcSockNonBlock(int listenDesc)
 	return 0;
 }
 
-IrcSocket *IRC(socket_make)()
+IrcSocket *Ircsocket_make()
 {
 	IrcSocket *sockLink;
 	int fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -121,11 +121,11 @@ void IrcLibFreeSocket(IrcSocket *q)
 void IrcLibAddCon(IrcListener *li, IrcSocket *q)
 {
 	LIST_INSERT_HEAD(&(li->links), q, socket_list);
-	IRC(SocketAddEvents)(q);
+	IrcSocketAddEvents(q);
 }
 
 
-int IRC(socket_bind)(IrcSocket *theSocket, int portNum, struct in_addr addr)
+int Ircsocket_bind(IrcSocket *theSocket, int portNum, struct in_addr addr)
 {
 	struct sockaddr_in sa;
 	int reuseAddr;
@@ -150,7 +150,7 @@ int IRC(socket_bind)(IrcSocket *theSocket, int portNum, struct in_addr addr)
 	return 0;
 }
 
-IrcListener *IRC(MakeListener)(IrcSocket *theSocket)
+IrcListener *IrcMakeListener(IrcSocket *theSocket)
 {
 	IrcListener *port;
 
@@ -174,7 +174,7 @@ IrcListener *IRC(MakeListener)(IrcSocket *theSocket)
 	return port;
 }
 
-void IRC(SocketAddEvents)(IrcSocket *theSocket)
+void IrcSocketAddEvents(IrcSocket *theSocket)
 {
 	struct event *p;
 	int foundRead = 0, foundWrite = 0;
@@ -199,7 +199,7 @@ void IRC(SocketAddEvents)(IrcSocket *theSocket)
 	theSocket->theEvent = p;
 }
 
-void IRC(ListenerAddEvents)(IrcListener *thePort)
+void IrcListenerAddEvents(IrcListener *thePort)
 {
 	struct event *p; 
 
@@ -247,7 +247,7 @@ IrcLibReadPackets(IrcSocket *ptrLink)
 	while(k > 0)
 	{
 		kt += k;
-		b = IRC(BufShove)(&ptrLink->inBuf, sockbuf, k);
+		b = IrcBufShove(&ptrLink->inBuf, sockbuf, k);
 
 		tailbuf:
 
@@ -311,7 +311,7 @@ IrcLibReadBinary(IrcSocket *ptrLink)
 	while(k > 0)
 	{
 		kt += k;
-		IRC(BufShoveBinary)(&ptrLink->inBuf, sockbuf, k);
+		IrcBufShoveBinary(&ptrLink->inBuf, sockbuf, k);
 		k = read(ptrLink->fd, sockbuf, sizeof(sockbuf));
 	}
 
@@ -375,12 +375,12 @@ IrcLibEventListener(int fd, short evType, void *vI)
 			close(pFd);
 	}
 
-	IRC(ListenerAddEvents)(li);
+	IrcListenerAddEvents(li);
 }
 
-void IRC(socket_connect)
-	(IRC(Socket)*sock, int portNum, struct in_addr addr,
-	int (* finHandler)(IRC(Socket)* sock, int errcode))
+void Ircsocket_connect
+	(IrcSocket*sock, int portNum, struct in_addr addr,
+	int (* finHandler)(IrcSocket* sock, int errcode))
 {
 	struct sockaddr_in sai;
 
@@ -406,7 +406,7 @@ void IRC(socket_connect)
 		return;
 	}
 
-	IRC(SocketAddEvents)(sock);
+	IrcSocketAddEvents(sock);
 }
 
 /*int (* xxdontCallMe ( int ((* x)()) )) {
@@ -430,7 +430,7 @@ IrcSend(IrcSocket *s, const char *fmt, ...)
 
 	strcat(buf, "\r\n");
 
-	IRC(BufShove)(&s->outBuf, buf, strlen(buf));
+	IrcBufShove(&s->outBuf, buf, strlen(buf));
 }
 
 /**
@@ -472,7 +472,7 @@ IrcLibEventSocket(int fd, short evType, void *p)
 			return;
 		}
 
-		while (IRC(BufDeQueue)(&q->inBuf, buf, q->readFunc == IrcLibReadPackets ? 0 : 2)) {
+		while (IrcBufDeQueue(&q->inBuf, buf, q->readFunc == IrcLibReadPackets ? 0 : 2)) {
 			if ( (* q->func)(q, buf) < 0 ) {
 				close(q->fd);
 				IrcLibdelCon(q);
@@ -508,7 +508,7 @@ IrcLibEventSocket(int fd, short evType, void *p)
 			}
 		}
 
-		while (IRC(BufDeQueue)(&q->outBuf, buf, 1)) {
+		while (IrcBufDeQueue(&q->outBuf, buf, 1)) {
 			if ( send(q->fd, buf, strlen(buf), 0) < 0 ) {
 				q->flags &= ~IRCSOCK_WRITE;
 
@@ -520,7 +520,7 @@ IrcLibEventSocket(int fd, short evType, void *p)
 		
 	}
 
-	IRC(SocketAddEvents)(q);
+	IrcSocketAddEvents(q);
 }
 
 /**
@@ -596,7 +596,7 @@ qPush(IrcBuf *t, char *text, char *sep)
  */
 
 char *
-IRC(BufShove)(IrcBuf *t, char *textIn, size_t textLen)
+IrcBufShove(IrcBuf *t, char *textIn, size_t textLen)
 {
 	char *p;
 	char *text = textIn;
@@ -619,7 +619,7 @@ IRC(BufShove)(IrcBuf *t, char *textIn, size_t textLen)
 
 
 char *
-IRC(BufShoveBinary)(IrcBuf *t, char *textIn, size_t textLen)
+IrcBufShoveBinary(IrcBuf *t, char *textIn, size_t textLen)
 {
 	BufQel *z;
 
@@ -650,7 +650,7 @@ IRC(BufShoveBinary)(IrcBuf *t, char *textIn, size_t textLen)
  *        fill cmd, and be removed from the buffer.
  */
 int
-IRC(BufDeQueue)(IrcBuf *t, char cmd[IRCBUFSIZE], int sendcr)
+IrcBufDeQueue(IrcBuf *t, char cmd[IRCBUFSIZE], int sendcr)
 {
 	BufQel *f;
 	char *cp;
@@ -718,7 +718,7 @@ IrcBufMakeEmpty(IrcBuf *t)
 {
 	char cmd[1025];
 
-	while(IRC(BufDeQueue)(t, cmd, 2))
+	while(IrcBufDeQueue(t, cmd, 2))
 		return;
 }
 
@@ -745,10 +745,10 @@ int
 IrcLibDefaultClientHandler(IrcSocket *q, char *buf)
 {
 	if (q->parser) {
-		IRC(Message) m;
+		IrcMessage m;
 		int i;
 
-		IRC(MakeMessage)(&m, buf);
+		IrcMakeMessage(&m, buf);
 
 		if (m.command) {
 			for(i = 0; q->parser[i].name; i++)

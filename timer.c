@@ -38,7 +38,7 @@
 
 /*
 typedef int timerCallBack (void *pData);
-typedef int timerCallBackSocket (IRC(Socket)*, void *pData);
+typedef int timerCallBackSocket (IrcSocket*, void *pData);
 
 */
 
