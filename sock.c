@@ -30,6 +30,7 @@
 
 void IrcLibEventSocket(int fd, short evType, void *p);
 void IrcLibEventListener(int fd, short evType, void *p);
+void IrcLibEventSockWrite(int fd, short evType, void *p);
 
 /********************************************************************/
 
@@ -137,6 +138,12 @@ void LibIrcSocketAddevents(IrcSocket *theSocket)
 
 	event_set(p, theSocket->fd, EV_READ, IrcLibEventSocket, theSocket);
 	event_add(p, NULL);
+
+	if ((theSocket->flags & IRCSOCK_WRITE) == 0)
+	{
+		event_set(p, theSocket->fd, EV_WRITE, IrcLibEventSockWrite, theSocket);
+		event_add(p, NULL);
+	}
 }
 
 void LibIrcListenerAddevents(IrcListener *thePort)
@@ -144,6 +151,7 @@ void LibIrcListenerAddevents(IrcListener *thePort)
 	struct event *p = oalloc(sizeof(struct event));
 
 	event_set(p, thePort->sock->fd, EV_READ, IrcLibEventListener, thePort);
+
 	event_add(p, NULL);
 }
 
@@ -165,7 +173,7 @@ IrcLibReadPackets(IrcSocket *ptrLink)
 	while(k > 0)
 	{
 		kt += k;
-		b = IrcLibShove(&ptrLink->buf, sockbuf, k);
+		b = IrcLibShove(&ptrLink->inBuf, sockbuf, k);
 
 		if (b && *b) {
 			int len;
@@ -194,8 +202,11 @@ IrcLibReadPackets(IrcSocket *ptrLink)
 	return 0;
 }
 
-
-void IrcLibEventListener(int fd, short evType, void *vI)
+/**
+ * @brief Fired on listener event
+ */
+void
+IrcLibEventListener(int fd, short evType, void *vI)
 {
 	IrcListener *li = (IrcListener *) vI;
 	IrcSocket *p;
@@ -228,7 +239,11 @@ void IrcLibEventListener(int fd, short evType, void *vI)
 }
 
 
-void IrcLibEventSocket(int fd, short evType, void *p)
+/**
+ * @brief Fired on socket readable event
+ */
+void
+IrcLibEventSocket(int fd, short evType, void *p)
 {
 	IrcSocket *q = (IrcSocket *)p;
 
@@ -242,11 +257,21 @@ void IrcLibEventSocket(int fd, short evType, void *p)
 		return;
 	}
 
-	while (IrcLib_pop(&q->buf, buf)) {
+	while (IrcLib_pop(&q->inBuf, buf)) {
 		// For now just flush out the buffer
 	}
 
 	LibIrcSocketAddevents(q);
+}
+
+/**
+ * @brief Fired when a socket becomes writable
+ */
+void IrcLibEventSockWrite(int fd, short evType, void *p)
+{
+	IrcSocket *q = (IrcSocket *)p;
+
+	q->flags |= IRCSOCK_WRITE;
 }
 
 /////////////

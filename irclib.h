@@ -103,6 +103,9 @@ void *oalloc(size_t);
 #define HOSTLEN		63
 #define USERLEN		8
 
+
+#define IRCSOCK_WRITE	0x1
+
 struct _ircbf
 {
         struct _ircbq *firstEls, *lastEls;
@@ -115,13 +118,17 @@ struct _ircsocket
 {
 #ifdef _IRCLIB
 	int fd;
+	int flags;
 	struct in_addr addr;
 
-	IrcLibSocketBuf buf;
+	IrcLibSocketBuf inBuf;
+	IrcLibSocketBuf outBuf;
 #else
 	char __fd__[INTBITS];
+	char __flags__[INTBITS];
 	char __addr__[sizeof(struct in_addr)];
-	char __buf__[sizeof(IrcLibSocketBuf)];
+	char __inbuf__[sizeof(IrcLibSocketBuf)];
+	char __outbuf__[sizeof(IrcLibSocketBuf)];
 #endif
 	LIST_ENTRY(_ircsocket)	socket_list;
 };
