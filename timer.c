@@ -112,6 +112,7 @@ ircTimer* ircTimerScheduleGlobal(struct timeval tv, timerCallBack *func)
 	return t;
 }
 
+/* Subtract stime from etime */
 static void irc_subtract_times(struct timeval *etime, struct timeval *stime)
 {
   etime->tv_sec -= stime->tv_sec;
