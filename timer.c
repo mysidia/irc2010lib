@@ -42,4 +42,6 @@ typedef int timerCallBackSocket (IRC(Socket)*, void *pData);
 
 timerSchedule(struct timeval tv, timerCallBack *func)
 timerScheduleAllSockets(struct timeval tv, timerCallBackSocket *func)
+
+struct timer
 */
