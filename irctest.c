@@ -20,13 +20,23 @@
 #include "irclib.h"
 #include "dns.h"
 #include <assert.h>
-ID("$Id: irctest.c,v 1.1 2004/03/28 09:58:52 mysidia Exp $");
+ID("$Id: irctest.c,v 1.2 2004/06/01 08:42:51 mysidia Exp $");
 
 struct
 Dns_Pass1 {
 	IrcSession* ses;
 	int port_no;
 };
+
+int myPing(IrcSocket* q, IrcMessage* t)
+{
+	char buf[IRCBUFSZ];
+
+	if (t->command) {
+		IrcMessageText(t, buf, sizeof(buf), 0, -1);
+		printf("PING[%s _ %s]\n", t->prefix, buf);
+	}
+}
 
 int myUnknown(IrcSocket* q, IrcMessage* t)
 {
@@ -42,6 +52,7 @@ int myUnknown(IrcSocket* q, IrcMessage* t)
 
 IrcMsgTab myTable[] =
 {
+		{ "PING", myPing },
 	        { NULL, myUnknown }
 };
 
@@ -83,16 +94,16 @@ int dnsFin (IrcDnsQuery *q, char *r, void *answer, void* data )
 
 		printf("DNS: %s port %d -> %s\n", q->ip, pass->port_no, r);
 		addr.s_addr = INADDR_ANY;
-	        addr.s_addr = inet_addr(r);
 		if (Ircsocket_bind(pass->ses->sock, 0, addr) < 0)
 		{
 			fprintf(stderr, "Error: unable to bind port\n");
 			exit(1);
 		}
+		addr.s_addr = inet_addr(r);
 		pass->ses->sock->func = IrcLibDefaultClientHandler;
 		pass->ses->sock->parser = myTable;
 	        Ircsocket_connect(pass->ses->sock, pass->port_no, addr, conDone);
-		Ircsess_setinfo(ses, "testnick", "testuser", "testhost.com", "real name");
+		Ircsess_setinfo(ses, "tstnick", "testusr", "testhost.com", "real name");
 		Ircsess_register(ses);
 	}
 	else {
