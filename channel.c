@@ -206,33 +206,33 @@ void IrcLibModeSetMode(IrcChannelMode *q, const char *flagsToSet,
 
 /********************************************************************/
 
-ilHashTable *chanHash = 0;
-
 const char *IrcChanHkeyPred(void *item) {
 	return ((IrcChannel *)item)->channelName->name;
 }
 
-void IrcAddChannelHash ( IrcChannel *cl )
+void IrcAddChannel ( ilHashTable **chanHash, IrcChannel *cl )
 {
-	if (chanHash == 0) {
-		chanHash = ilNewHashTable(256, IrcChanHkeyPred);
-		if (chanHash == 0) {
+	if (*chanHash == 0) {
+		*chanHash = ilNewHashTable(256, IrcChanHkeyPred);
+		if (*chanHash == 0) {
 			fprintf(stderr, "FATAL: Resources exhausted\n");
 			exit(11);
 		}
 	}
-	ilHashAdd(chanHash, cl);
+	ilHashAdd(*chanHash, cl);
 }
 
-IrcChannel *IrcFindChannelHash ( IRC(ChannelName) *cn )
+IrcChannel *IrcFindChannel ( ilHashTable **chanHash, IRC(ChannelName) *cn )
 {
-	if (chanHash == 0)
+	if (*chanHash == 0)
 		return 0;
-	return ilHashFind(chanHash, cn->name);
+	return ilHashFind(*chanHash, cn->name);
 }
 
-void IrcDelChannelHash ( IrcChannel *cl )
+void IrcDelChannel ( ilHashTable **chanHash, IrcChannel *cl )
 {
-	(void)ilHashDel(chanHash, cl);
+	(void)ilHashDel(*chanHash, cl);
 }
+
+/********************************************************************/
 

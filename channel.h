@@ -55,7 +55,7 @@ struct _chanhandle
 };
 typedef struct _chanhandle IrcChannel;
 
-void IrcAddChannelHash ( IrcChannel *cl );
-IrcChannel *IrcFindChannelHash ( IRC(ChannelName) *cn );
-void IrcDelChannelHash ( IrcChannel *cl );
+void IrcAddChannel ( ilHashTable**, IrcChannel *cl );
+IrcChannel *IrcFindChannel ( ilHashTable**, IRC(ChannelName) *cn );
+void IrcDelChannel ( ilHashTable**, IrcChannel *cl );
 
