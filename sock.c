@@ -71,6 +71,7 @@ IrcSocket *LibIrc_socket_make()
 
 	sockLink->fd = fd;
 	sockLink->func = IrcLibDefaultSockHandler;
+	sockLink->periodic = NULL;
 
 #ifdef LIST_ENTRY_INIT
 	LIST_ENTRY_INIT(sockLink, socket_list);
@@ -139,6 +140,8 @@ IrcListener *LibIrcMakeListener(IrcSocket *theSocket)
 
 	port->sock = theSocket;
 	port->sock->func = IrcLibDefaultListenHandler;
+	port->sock->periodic = NULL;
+
 	port->topFd = theSocket->fd;
 	LIST_INIT(&port->links);
 
@@ -327,6 +330,15 @@ IrcLibEventSocket(int fd, short evType, void *p)
 
 	if (evType & EV_TIMEOUT) 
 	{
+		if (q->periodic) {
+			if ( (* q->periodic)(q) < 0) {
+				close(q->fd);
+				IrcLibdelCon(q);
+				IrcFreeSocket(q);
+				return;
+			}
+		}
+
 		while (IrcLib_pop(&q->outBuf, buf, 1)) {
 			if ( send(q->fd, buf, strlen(buf), 0) < 0 ) {
 				q->flags &= ~IRCSOCK_WRITE;

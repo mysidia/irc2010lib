@@ -140,6 +140,7 @@ struct _ircsocket
 #endif
 
 	int (* func)(struct _ircsocket*, char *);
+	int (* periodic)(struct _ircsocket*);
 
 	LIST_ENTRY(_ircsocket)	socket_list;
 };
