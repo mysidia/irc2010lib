@@ -7,7 +7,7 @@ int main()
 	IrcListener *q;
 	struct in_addr addr;
 
-	init_irc();
+	LibIrcInit();
 
 	p = LibIrc_socket_make();
 
@@ -22,9 +22,9 @@ int main()
 		abort();
 	printf("Listening on %d\n", 3030);
 
-	LibIrc_listen_addevents(q);
+	LibIrcListenerAddevents(q);
 	
-	start_irc();
+	LibIrcSystemLoop();
 
 //	sleep (6000);
 }

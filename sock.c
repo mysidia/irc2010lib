@@ -131,7 +131,7 @@ IrcListener *LibIrc_socket_listen(IrcSocket *theSocket)
 	return port;
 }
 
-void LibIrc_socket_addevents(IrcSocket *theSocket)
+void LibIrcSocketAddevents(IrcSocket *theSocket)
 {
 	struct event *p = oalloc(sizeof(struct event));
 
@@ -139,7 +139,7 @@ void LibIrc_socket_addevents(IrcSocket *theSocket)
 	event_add(p, NULL);
 }
 
-void LibIrc_listen_addevents(IrcListener *thePort)
+void LibIrcListenerAddevents(IrcListener *thePort)
 {
 	struct event *p = oalloc(sizeof(struct event));
 
@@ -224,7 +224,7 @@ void IrcLibEventListener(int fd, short evType, void *vI)
 			close(pFd);
 	}
 
-	LibIrc_listen_addevents(li);
+	LibIrcListenerAddevents(li);
 }
 
 
@@ -246,7 +246,7 @@ void IrcLibEventSocket(int fd, short evType, void *p)
 		// For now just flush out the buffer
 	}
 
-	LibIrc_socket_addevents(q);
+	LibIrcSocketAddevents(q);
 }
 
 /////////////

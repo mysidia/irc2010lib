@@ -26,13 +26,13 @@
 #include "irclib.h"
 #include <event.h>
 
-void init_irc()
+void LibIrcInit()
 {
 	event_init();
 }
 
 
-void start_irc()
+int LibIrcSystemLoop()
 {
 	if ( event_dispatch() < 0 )
 		abort();

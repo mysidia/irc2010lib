@@ -140,7 +140,8 @@ int LibIrcSockNonBlock(int listenDesc);
 IrcSocket *LibIrc_socket_make();
 int LibIrc_socket_bind(IrcSocket *theSocket, int portNum, struct in_addr addr);
 IrcListener *LibIrc_socket_listen(IrcSocket *theSocket);
-void LibIrc_socket_addevents(IrcSocket *theSocket);
+void LibIrcSocketAddevents(IrcSocket *theSocket);
+void LibIrcListenerAddevents(IrcListener *);
 
 int IrcLibReadPackets(IrcSocket *ptrLink);
 void IrcLibEventListener(int fd, short evType, void *p);
@@ -149,5 +150,8 @@ char *IrcLibShove(IrcBuf *t, char *textIn, size_t textLen);
 int IrcLib_pop(IrcBuf *t, char cmd[IRCBUFSIZE]);
 int IrcLibBufIsEmpty(IrcBuf *t);
 void IrcBufMakeEmpty(IrcBuf *t);
+
+void LibIrcInit();
+int LibIrcSystemLoop();
 
 #define IrcLibPop IrcLib_pop
