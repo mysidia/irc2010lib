@@ -35,3 +35,11 @@
  *       - Global timed event
  *       - Timed event to be iterated over each socket
  */
+
+/*
+typedef int timerCallBack (void *pData);
+typedef int timerCallBackSocket (IRC(Socket)*, void *pData);
+
+timerSchedule(struct timeval tv, timerCallBack *func)
+timerScheduleAllSockets(struct timeval tv, timerCallBackSocket *func)
+*/

@@ -182,8 +182,8 @@ int IrcLibReadPackets(IRC(Socket) *ptrLink);
 void IrcLibEventListener(int fd, short evType, void *p);
 void IrcLibEventSocket(int fd, short evType, void *p);
 void IrcLibEventFlushSockets(int fd, short evType, void *p);
-char *IrcLibShove(IrcBuf *t, char *textIn, size_t textLen);
-int IrcLib_pop(IrcBuf *t, char cmd[IRCBUFSIZE], int);
+char *IRC(BufShove)(IrcBuf *t, char *textIn, size_t textLen);
+int IRC(BufDeQueue)(IrcBuf *t, char cmd[IRCBUFSIZE], int);
 int IrcLibBufIsEmpty(IrcBuf *t);
 void IrcBufMakeEmpty(IrcBuf *t);
 

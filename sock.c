@@ -31,7 +31,7 @@
 #include "irclib.h"
 #include <stddef.h>
 
-ID("$Id: sock.c,v 1.23 2001/10/25 04:30:13 mysidia Exp $");
+ID("$Id: sock.c,v 1.24 2001/10/25 05:18:10 mysidia Exp $");
 
 void IrcLibEventSocket(int fd, short evType, void *p);
 void IrcLibEventListener(int fd, short evType, void *p);
@@ -228,7 +228,7 @@ IrcLibReadPackets(IrcSocket *ptrLink)
 	while(k > 0)
 	{
 		kt += k;
-		b = IrcLibShove(&ptrLink->inBuf, sockbuf, k);
+		b = IRC(BufShove)(&ptrLink->inBuf, sockbuf, k);
 
 		tailbuf:
 
@@ -332,7 +332,7 @@ IrcSend(IrcSocket *s, const char *fmt, ...)
 	vsnprintf(buf, sizeof(buf), fmt, ap);
 	va_end(ap);
 
-	IrcLibShove(&s->outBuf, buf, strlen(buf));
+	IRC(BufShove)(&s->outBuf, buf, strlen(buf));
 }
 
 /**
@@ -362,7 +362,7 @@ IrcLibEventSocket(int fd, short evType, void *p)
 			return;
 		}
 
-		while (IrcLib_pop(&q->inBuf, buf, 0)) {
+		while (IRC(BufDeQueue)(&q->inBuf, buf, 0)) {
 			if ( (* q->func)(q, buf) < 0 ) {
 				close(q->fd);
 				IrcLibdelCon(q);
@@ -385,7 +385,7 @@ IrcLibEventSocket(int fd, short evType, void *p)
 			}
 		}
 
-		while (IrcLib_pop(&q->outBuf, buf, 1)) {
+		while (IRC(BufDeQueue)(&q->outBuf, buf, 1)) {
 			if ( send(q->fd, buf, strlen(buf), 0) < 0 ) {
 				q->flags &= ~IRCSOCK_WRITE;
 
@@ -473,7 +473,7 @@ qPush(IrcBuf *t, char *text, char *sep)
  */
 
 char *
-IrcLibShove(IrcBuf *t, char *textIn, size_t textLen)
+IRC(BufShove)(IrcBuf *t, char *textIn, size_t textLen)
 {
 	char *p;
 	char *text = textIn;
@@ -506,7 +506,7 @@ IrcLibShove(IrcBuf *t, char *textIn, size_t textLen)
  *        fill cmd, and be removed from the buffer.
  */
 int
-IrcLib_pop(IrcBuf *t, char cmd[IRCBUFSIZE], int sendcr)
+IRC(BufDeQueue)(IrcBuf *t, char cmd[IRCBUFSIZE], int sendcr)
 {
 	BufQel *f;
 	char *cp;
@@ -571,7 +571,7 @@ IrcBufMakeEmpty(IrcBuf *t)
 {
 	char cmd[1025];
 
-	while(IrcLib_pop(t, cmd, 0))
+	while(IRC(BufDeQueue)(t, cmd, 0))
 		return;
 }
 
