@@ -1,4 +1,5 @@
 /*
+ * Library Header
  * Copyright (c) 2001 ***REMOVED***
  * All rights reserved.
  *
