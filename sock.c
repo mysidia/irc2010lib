@@ -26,6 +26,9 @@
 
 #include "irclib.h"
 #include <stddef.h>
+#include <event.h>
+
+void irclibEventSocket(int fd, short evType, void *);
 
 /********************************************************************/
 
@@ -110,6 +113,10 @@ Listener *socket_listen(Socket *theSocket)
 
 void socket_addevents(Socket *theSocket)
 {
+	struct event *p = oalloc(sizeof(struct event));
+
+	event_set(p, theSocket->fd, EV_READ, irclibEventSocket, theSocket);
+	event_add(p, NULL);
 }
 
 /**
@@ -188,23 +195,21 @@ void irclibEventListener(Listener *li)
 }
 
 
-void irclibEventSocketRead(Socket *p)
+void irclibEventSocket(int fd, short evType, void *p)
 {
+	Socket *q = (Socket *)p;
 
 	char buf[SOCKBUFSIZE];
 
-	if (IrcLibReadPackets(p) < 0)
+	if (IrcLibReadPackets(q) < 0)
 	{
-		close(p->fd);
-		delCon(p);
-		freeCon(p);
+		close(q->fd);
+		delCon(q);
+		freeCon(q);
 		return;
 	}
 
-	while (IrcLibPop(p, buf)) {
+	while (IrcLibPop(q, buf)) {
 	}
 }
 
-void irclibEventSocketWrite(Socket *p)
-{
-}

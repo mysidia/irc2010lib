@@ -4,9 +4,11 @@
 #include <string.h>
 #include <stddef.h>
 #include <errno.h>
+#include <time.h>
 #include <unistd.h>
 #include <fcntl.h>
 
+#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/file.h>
 #include <sys/socket.h>
