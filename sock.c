@@ -473,16 +473,19 @@ IrcLibShove(IrcBuf *t, char *textIn, size_t textLen)
 	char *text = textIn;
 
 	for(p = text; p < (textIn + textLen); p++) {
-//		if (*p == '\n' || (*p == '\r' && p[1] == '\n')) {
-//			if (*p == '\r')
-		if (*p == '\n' || *p == '\r') {
-			while((p<(textIn+textLen))&&(*p=='\r'||*p=='\n'))
-				p++;
+		if (*p == '\n' || (*p == '\r' && p[1] == '\n')) {
 			text = qPush(t, text, p);
+
+			while((p<(textIn+textLen)) && (*p=='\r'||*p=='\n')) {
+				p++;
+				text++;
+			}
 		}
 	}
 
-	return text;
+	if (text < (textIn + textLen))
+		return text;
+	return "";
 }
 
 /**
