@@ -1,0 +1,6 @@
+#!/bin/sh
+
+echo 1>&2 "
+           The utility '$1' is required to proceed and does not seem to be
+           available.
+"
