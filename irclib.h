@@ -43,7 +43,7 @@
 
 #define IRC(x)	IrcLib##x
 
-#define IRC_MALLOC(x) malloc((x))
+#define IRC_MALLOC(x) oalloc((x))
 #define IRC_FREE(x) do { free((x)); (x) = 0; } while(0)
 
 #define IRCLIB_MMP(ma,mi,pl) \
