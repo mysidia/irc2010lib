@@ -31,7 +31,7 @@
 #include "irclib.h"
 #include "dns.h"
 
-ID("$Id: irc.c,v 1.13 2002/04/10 22:01:37 mysidia Exp $");
+ID("$Id: irc.c,v 1.14 2004/03/11 22:09:11 mysidia Exp $");
 time_t CTime;
 
 /**
@@ -50,8 +50,8 @@ int IRC(SystemLoop)()
 {
 	CTime = time(NULL);
 
-	if ( event_dispatch() < 0 )
-		abort();
+	if ( event_dispatch() < 0 ) /* Eventlib: dispatch events */
+		abort(); 
 }
 
 /**
