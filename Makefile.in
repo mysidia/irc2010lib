@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# $Id: Makefile.in,v 1.5 2001/10/23 23:05:24 mysidia Exp $
+# $Id: Makefile.in,v 1.6 2001/10/24 03:51:34 mysidia Exp $
 #
 #
 
@@ -82,7 +82,7 @@ stest_SOURCES = stest.c
 stest_LDADD = libirc.la -levent
 
 lib_LTLIBRARIES = libirc.la
-libirc_la_SOURCES = match.c mem.c sock.c server.c irc.c
+libirc_la_SOURCES = match.c mem.c sock.c server.c irc.c channel.c
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
@@ -93,7 +93,7 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libirc_la_LDFLAGS = 
 libirc_la_LIBADD = 
-libirc_la_OBJECTS =  match.lo mem.lo sock.lo server.lo irc.lo
+libirc_la_OBJECTS =  match.lo mem.lo sock.lo server.lo irc.lo channel.lo
 PROGRAMS =  $(bin_PROGRAMS)
 
 stest_OBJECTS =  stest.o
@@ -113,8 +113,8 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP_ENV = --best
-DEP_FILES =  .deps/irc.P .deps/match.P .deps/mem.P .deps/server.P \
-.deps/sock.P .deps/stest.P
+DEP_FILES =  .deps/channel.P .deps/irc.P .deps/match.P .deps/mem.P \
+.deps/server.P .deps/sock.P .deps/stest.P
 SOURCES = $(libirc_la_SOURCES) $(stest_SOURCES)
 OBJECTS = $(libirc_la_OBJECTS) $(stest_OBJECTS)
 

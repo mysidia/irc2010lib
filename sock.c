@@ -356,7 +356,6 @@ IrcLibEventSocket(int fd, short evType, void *p)
 		}
 
 		while (IrcLib_pop(&q->outBuf, buf, 1)) {
-printf("---\n");
 			if ( send(q->fd, buf, strlen(buf), 0) < 0 ) {
 				q->flags &= ~IRCSOCK_WRITE;
 
