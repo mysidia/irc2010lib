@@ -47,3 +47,5 @@ typedef struct
 	IrcSocket *links;
 } IrcListener;
 
+
+#define IrcLibPop IrcLib_pop

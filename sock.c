@@ -137,7 +137,7 @@ IrcLibReadPackets(IrcSocket *ptrLink)
 	while(k > 0)
 	{
 		kt += k;
-		b = IrcLibShove(ptrLink, sockbuf, k);
+		b = IrcLibShove(ptrLink->buf, sockbuf, k);
 
 		if (b && *b) {
 			int len;
@@ -209,7 +209,151 @@ void irclibEventSocket(int fd, short evType, void *p)
 		return;
 	}
 
-	while (IrcLibPop(q, buf)) {
+	while (IrcLib_pop(q, buf)) {
+		// For now just flush out the buffer
 	}
 }
 
+/////////////
+
+struct _ircbq {
+		char *text;	///< Text of the line
+		struct _ircbq *next;	///< Pointer to the next line of text
+		size_t len;	///< Line length
+};
+
+typedef struct _ircbq BufQel;
+
+struct _ircbf
+{
+	BufQel *firstEls, *lastEls;
+};
+
+typedef struct _ircbf IrcBuf;
+
+/**
+ * @internal
+ * @brief Called by shove() to push a piece of the message
+ *        before a \\n onto the buffer.
+ */
+static char *qPush(IrcBuf *t, char *text, char *sep) {
+	BufQel *z;
+
+	z = (BufQel *)oalloc(sizeof(BufQel) + (sep - text + 1));
+
+	*sep = '\0';
+	z->len = sep - text;
+	z->text = (char *)oalloc(z->len + 1);
+	strcpy(z->text, text);
+
+	if (t->firstEls == NULL)
+		t->firstEls = t->lastEls = z;
+	else
+		{
+			t->lastEls->next = z;
+			t->lastEls = z;
+		}
+
+	*sep = '\n';
+
+	return (sep + 1);
+}
+
+/**
+ * @brief Fill the buffer from input data and return
+ *        the leftovers
+ *
+ * @param textIn Text to buffer for processing
+ * @param textLen Length of the text (in bytes)
+ * @return An offset of textIn after which no text
+ *         is buffered.
+ * @pre   textIn points to a character array of
+ *        size textLen.
+ * @post  Each substring ending with a \\n inside
+ *        #textIn is now in a buffer element, and
+ *        buffer elements are in the order in which
+ *        text was input.  If the array returned is
+ *        empty then all text has been buffered,
+ *        else that which has not been buffered is
+ *        contained.
+ */
+
+char *IrcLibShove(IrcBuf *t, char *textIn, size_t textLen)
+{
+	char *p;
+	char *text = textIn;
+
+	for(p = text; p < (textIn + textLen); p++) {
+		if (*p == '\n' || (*p == '\r' && p[1] == '\n')) {
+			text = qPush(t, text, p);
+		}
+	}
+
+	return text;
+}
+
+/**
+ * @brief Get buffered text and place it in cmd.
+ * @param Buffer to place text in
+ * @return 1 if a cmd has been loaded with a buffered item,
+ *         0 if there is no text in the buffer.
+ * @pre   Cmd is a memory area of type char [] with
+ *        a size of at least #IPCBUFSIZE bytes.
+ * @post  If an item is buffered for processing,
+ *        then the text of the next item will
+ *        fill cmd, and be removed from the buffer.
+ */
+int IrcLib_pop(IrcBuf *t, char cmd[IRCBUFSIZE]) {
+	BufQel *f;
+	char *cp;
+
+	if (t->firstEls == NULL)
+		return 0;
+
+	f = t->firstEls;
+
+	if (t->firstEls == t->lastEls)
+		t->firstEls = t->lastEls = NULL;
+	else
+		t->firstEls = t->firstEls->next;
+
+	strncpy(cmd, f->text, IRCBUFSIZE);
+	cmd[IRCBUFSIZE - 1] = '\0';
+
+	cp = cmd + strlen(cmd) - 1;
+
+	if (*cp == '\n' || *cp == '\r')
+		*cp = '\0';
+
+	if ((cp - 1) > cmd && (cp[-1] == '\r' || cp[-1] == '\n'))
+		cp[-1] = '\0';
+
+	free(f->text);
+	free(f);
+
+	return 1;
+}
+
+/**
+ * @brief Is the buffer empty or no?
+ * @return False if the buffer contains any text,
+ *         not-false if the buffer contains text.
+ */
+int IrcBufIsEmpty(IrcBuf *t)
+{
+	if (t->firstEls == NULL)
+		return 1;
+	return 0;
+}
+
+/**
+ * @brief Empty the buffer
+ * @post  The buffer contains no items.
+ */
+void IrcBufMakeEmpty(IrcBuf *t)
+{
+	char cmd[1025];
+
+		while(IrcLib_pop(t, cmd))
+			return;
+}
