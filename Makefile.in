@@ -51,7 +51,7 @@ CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
 
-# $Id: Makefile.in,v 1.24 2004/03/17 19:23:26 mysidia Exp $
+# $Id: Makefile.in,v 1.25 2004/03/28 07:39:48 mysidia Exp $
 #
 #
 DEFS = -D_IRCLIB_INTERNAL @DEFS@
@@ -135,7 +135,7 @@ sockmon_LDADD = libirc.la -levent -ladns
 
 lib_LTLIBRARIES = libirc.la
 libirc_la_SOURCES = match.c mem.c sock.c server.c irc.c channel.c dns.c hash.c \
- proto.c user.c
+ proto.c user.c session.c
 
 include_HEADERS = irclib.h proto.h hash.h timer.h dns.h queue.h
 
@@ -149,7 +149,7 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libirc_la_LDFLAGS =
 libirc_la_LIBADD =
 am_libirc_la_OBJECTS = match.lo mem.lo sock.lo server.lo irc.lo \
-	channel.lo dns.lo hash.lo proto.lo user.lo
+	channel.lo dns.lo hash.lo proto.lo user.lo session.lo
 libirc_la_OBJECTS = $(am_libirc_la_OBJECTS)
 bin_PROGRAMS = stest$(EXEEXT) ctest$(EXEEXT) sockmon$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
@@ -174,9 +174,9 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/dns.Plo ./$(DEPDIR)/hash.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/irc.Plo ./$(DEPDIR)/match.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/mem.Plo ./$(DEPDIR)/proto.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/server.Plo ./$(DEPDIR)/sock.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/sockmon.Po ./$(DEPDIR)/stest.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/user.Plo
+@AMDEP_TRUE@	./$(DEPDIR)/server.Plo ./$(DEPDIR)/session.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/sock.Plo ./$(DEPDIR)/sockmon.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/stest.Po ./$(DEPDIR)/user.Plo
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -298,6 +298,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/proto.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/session.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockmon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stest.Po@am__quote@

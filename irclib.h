@@ -39,6 +39,8 @@
 #include <errno.h>
 #include <time.h>
 
+#define NUM_MODES 52
+
 #define IRC(x)	IrcLib##x
 
 #define IRCLIB_MMP(ma,mi,pl) \
@@ -76,6 +78,7 @@
 
 #ifdef HAVE_VALUES_H
 #include <values.h>
+#endif
 
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
@@ -105,7 +108,6 @@
 
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#endif
 
 #ifdef HAVE_EVENT_H
 #include <event.h>
@@ -291,13 +293,18 @@ extern time_t CTime;
 #	define __USEVAR(s) __IDSTRING(s, "(null)")
 #endif
 
-
+struct IRC(_modemap_st)
+{
+	int inuse, takes_arg;
+};
 
 struct IRC(_session)
 {
 	IRC(Socket) *sock;		/* Daemon socket */
-	ircHashTable **chanHash;	/* Channels */
+	ircHashTable *chanHash;	/* Channels */
+	struct IRC(_modemap_st) modemap[NUM_MODES + 1];
 	LIST_HEAD(, ircTimer)	timers;
 };
 typedef struct IRC(_session) IRC(Ses);
 typedef struct IRC(_session) IRC(Session);
+typedef struct IRC(_modemap_st) IrcModeMap;

@@ -1,5 +1,5 @@
 /*
- *  Channel Header
+ *  DNS Interface
  *  Copyright C 2001 ***REMOVED***.  All Rights Reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -23,64 +23,28 @@
  *  covered by the GNU General Public License.
  *
  */
-
 /**
- * @file channel.h
- * @brief Channel Header
+ * @file session.c
+ * @brief Session Management
  */
 
-#include "user.h"
+/**
+ * Session management
+ */
+#include "irclib.h"
+#include "channel.h"
 
-#define IEOL "\r\n"
-#define DEFCHANHASHSIZE 10
+ID("$Id: session.c,v 1.1 2004/03/28 07:39:48 mysidia Exp $");
 
-struct _irc_hash_table;
-
-struct _chan_mode_par {
-	char fl;
-	char *value;
-};
-typedef struct _chan_mode_par IrcChannelModePar;
-
-struct _chanmode
+/**
+ * Create a session
+ */
+IRC(Session)* irc_session_make()
 {
-	IrcChannelModePar	*modeparams;
-	long mode[2];
+	IRC(Session)* ses = (IRC(Session) *)oalloc(sizeof(IRC(Session)));
 
-	char paramCount;
-};
-typedef struct _chanmode IrcChannelMode;
-typedef struct _chanmode IRC(ChannelMode);
-
-
-struct _channame
-{
-	char	*name;
-};
-typedef struct _channame IRC(ChannelName);
-
-struct _chanhandle
-{
-	LIST_HEAD(,_chanuser)	*users;
-	IRC(ChannelName)	*channelName;
-	time_t			created;
-	time_t			lastTime;
-	IrcChannelMode		mode;
-};
-typedef struct _chanhandle IrcChannel;
-
-struct _chanuser
-{
-	int flags;
-//	IRC(NickName)		nick;
-};
-
-void IrcAddChannel ( struct _irc_hash_table**, IrcChannel *cl );
-IrcChannel *IrcFindChannel ( struct _irc_hash_table**, IRC(ChannelName) *cn );
-void IrcDelChannel ( struct _irc_hash_table**, IrcChannel *cl );
-char * IRC(ChanCgetName) (IRC(ChannelName) *cn);
-char * IRC(ChanGetName) (IrcChannel* cn);
-const char * IRC(ChanVoidPtrHashableName) (void* cn);
-
-
-
+	LIST_INIT(&ses->timers);
+	memset(ses->modemap, 0, sizeof(ses->modemap));
+	ses->chanHash = ilNewHashTable(DEFCHANHASHSIZE, IRC(ChanVoidPtrHashableName));
+	ses->sock = NULL;
+}

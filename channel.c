@@ -40,6 +40,17 @@ char * IRC(ChanCgetName) (IRC(ChannelName) *cn)
 	return ( cn )->name;
 }
 
+char * IRC(ChanGetName) (IrcChannel* cn)
+{
+	return ( ( cn )->channelName )->name;
+}
+
+const char * IRC(ChanVoidPtrHashableName) (void* cn)
+{
+	return ( ((IrcChannel *) cn )->channelName )->name;
+}
+
+
 const IRC(ChannelName) IRC(ChanMakeTempName) (const char *name)
 {
 	IRC(ChannelName) tmp;
@@ -107,8 +118,12 @@ void IRC(ChanPart) (IRC(Ses)so, IRC(ChannelName) *chan_name)
 
 #define BIT(x)	(1 << (x))
 
-static struct { char fl; int mask1, mask2; }
-IrcModeBitMap[] =
+static struct { 
+	char fl; 
+	int mask1;
+	int mask2;
+}
+IrcModeBitMap[NUM_MODES+1] =
 {
 	{ 'a', BIT( 0), BIT( 0) },	{ 'b', BIT( 1), BIT( 0) },
 	{ 'c', BIT( 2), BIT( 0) },	{ 'd', BIT( 3), BIT( 0) },
@@ -167,7 +182,7 @@ IrcChannelMode IrcLibFlagToMode(char flag)
 	return mode;
 }
 
-void IrcLibModeSetMode(IrcChannelMode *q, const char *flagsToSet,
+void IrcLibModeSetMode(IRC(Session)* ses, IrcChannelMode *q, const char *flagsToSet,
 	const char *para[], int paraArgc,
 	int (* paramHandler)(char mode, const char *))
 {
