@@ -28,7 +28,8 @@
 #include <stddef.h>
 #include <event.h>
 
-void irclibEventSocket(int fd, short evType, void *);
+void IrcLibEventSocket(int fd, short evType, void *p);
+void IrcLibEventListener(int fd, short evType, void *p);
 
 /********************************************************************/
 
@@ -37,7 +38,7 @@ void irclibEventSocket(int fd, short evType, void *);
  * @param File descriptor of endpoint
  * @return 0 on success, -1 on failure
  */
-int doNonBlock(int listenDesc)
+int LibIrcSockNonBlock(int listenDesc)
 {
 	int optionValue;
 
@@ -69,23 +70,41 @@ IrcSocket *LibIrc_socket_make()
 	sockLink = oalloc(sizeof(IrcSocket));
 
 	sockLink->fd = fd;
+
+#ifdef LIST_ENTRY_INIT
+	LIST_ENTRY_INIT(sockLink, socket_list);
+#endif
+
 	return;
 }
 
-int LibIrc_socket_bind(IrcSocket *theSocket, int portNum)
+void IrcLibdelCon(IrcSocket *q)
+{
+}
+
+void IrcLibFreeSocket(IrcSocket *q)
+{
+}
+
+void IrcLibAddCon(IrcListener *li, IrcSocket *q)
+{
+}
+
+
+int LibIrc_socket_bind(IrcSocket *theSocket, int portNum, struct in_addr addr)
 {
 	struct sockaddr_in sa;
 	int reuseAddr;
 
 	bzero(&sa, sizeof(sa));
 	sa.sin_port = htons(portNum);
-	sa.sin_addr.s_addr = 0x100007f; /*INADDR_ANY;*/
+	sa.sin_addr = addr;
 	sa.sin_family = AF_INET;
 
 	reuseAddr = 1;
 	setsockopt(theSocket->fd, SOL_SOCKET, SO_REUSEADDR, &reuseAddr, sizeof(int));
 
-	doNonBlock(theSocket->fd);
+	LibIrcSockNonBlock(theSocket->fd);
 
 	if (bind(theSocket->fd, (struct sockaddr *) &sa, sizeof(struct sockaddr_in)) < 0) {
 		perror("bind");
@@ -107,6 +126,7 @@ IrcListener *LibIrc_socket_listen(IrcSocket *theSocket)
 
 	port->sock = theSocket;
 	port->topFd = theSocket->fd;
+	LIST_INIT(&port->links);
 
 	return port;
 }
@@ -115,7 +135,15 @@ void LibIrc_socket_addevents(IrcSocket *theSocket)
 {
 	struct event *p = oalloc(sizeof(struct event));
 
-	event_set(p, theSocket->fd, EV_READ, irclibEventSocket, theSocket);
+	event_set(p, theSocket->fd, EV_READ, IrcLibEventSocket, theSocket);
+	event_add(p, NULL);
+}
+
+void LibIrc_listen_addevents(IrcListener *thePort)
+{
+	struct event *p = oalloc(sizeof(struct event));
+
+	event_set(p, thePort->sock->fd, EV_READ, IrcLibEventListener, thePort);
 	event_add(p, NULL);
 }
 
@@ -137,7 +165,7 @@ IrcLibReadPackets(IrcSocket *ptrLink)
 	while(k > 0)
 	{
 		kt += k;
-		b = IrcLibShove(ptrLink->buf, sockbuf, k);
+		b = IrcLibShove(&ptrLink->buf, sockbuf, k);
 
 		if (b && *b) {
 			int len;
@@ -167,8 +195,9 @@ IrcLibReadPackets(IrcSocket *ptrLink)
 }
 
 
-void irclibEventListener(IrcListener *li)
+void IrcLibEventListener(int fd, short evType, void *vI)
 {
+	IrcListener *li = (IrcListener *) vI;
 	IrcSocket *p;
 	struct sockaddr_in sai;
 	int pFd, alen, ipOk;
@@ -180,22 +209,26 @@ void irclibEventListener(IrcListener *li)
 		//if (sai.sin_addr.s_addr == 0x1000007f)
 		//	ipOk = 1;
 
-		if (doNonBlock(pFd) != -1 && ipOk) 
+		if (LibIrcSockNonBlock(pFd) != -1 && ipOk) 
 		{
 			if (pFd > li->topFd)
 				li->topFd = pFd;
 			p = (IrcSocket *)oalloc(sizeof(IrcSocket));
-			IrcLibaddCon(li, p);
+			IrcLibAddCon(li, p);
 			p->fd = pFd;
 			p->addr = sai.sin_addr;
+//XXX debug
+			printf("Incoming link from %x\n", sai.sin_addr.s_addr);
 		}
 		else
 			close(pFd);
 	}
+
+	LibIrc_listen_addevents(li);
 }
 
 
-void irclibEventSocket(int fd, short evType, void *p)
+void IrcLibEventSocket(int fd, short evType, void *p)
 {
 	IrcSocket *q = (IrcSocket *)p;
 
@@ -204,14 +237,16 @@ void irclibEventSocket(int fd, short evType, void *p)
 	if (IrcLibReadPackets(q) < 0)
 	{
 		close(q->fd);
-		delCon(q);
-		freeCon(q);
+		IrcLibdelCon(q);
+		IrcFreeSocket(q);
 		return;
 	}
 
-	while (IrcLib_pop(q, buf)) {
+	while (IrcLib_pop(&q->buf, buf)) {
 		// For now just flush out the buffer
 	}
+
+	LibIrc_socket_addevents(q);
 }
 
 /////////////
@@ -223,13 +258,6 @@ struct _ircbq {
 };
 
 typedef struct _ircbq BufQel;
-
-struct _ircbf
-{
-	BufQel *firstEls, *lastEls;
-};
-
-typedef struct _ircbf IrcBuf;
 
 /**
  * @internal
@@ -339,7 +367,7 @@ int IrcLib_pop(IrcBuf *t, char cmd[IRCBUFSIZE]) {
  * @return False if the buffer contains any text,
  *         not-false if the buffer contains text.
  */
-int IrcBufIsEmpty(IrcBuf *t)
+int IrcLibBufIsEmpty(IrcBuf *t)
 {
 	if (t->firstEls == NULL)
 		return 1;

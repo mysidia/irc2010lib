@@ -1,6 +1,6 @@
 /*
- *  Memory management
- *  Copyright C 2001 ***REMOVED***. All Rights Reserved.
+ *  Primary Interface
+ *  Copyright C 2001 ***REMOVED***.  All Rights Reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,30 +23,17 @@
  *  covered by the GNU General Public License.
  *
  */
-
 #include "irclib.h"
+#include <event.h>
 
-/*! 
- * \fn void * oalloc (size_t size)
- * \brief Clean and allocate a memory area.
- * \param size How many bytes of memory are to be allocated
- *
- * Allocate n bytes of memory, check that is was properly allocated
- * and clean it.  This function is like calloc(), but will shut
- * down services cleanly if it fails to allocate
- */
-void *
-oalloc(size_t iMemLen)
+void init_irc()
 {
-	void *vBuf;
+	event_init();
+}
 
-	if ((vBuf = calloc(iMemLen, 1)) == (void *)0)
+
+void start_irc()
+{
+	if ( event_dispatch() < 0 )
 		abort();
-	return vBuf;
 }
-
-void IrcFreeSocket(IrcSocket *q)
-{
-	free(q);
-}
-
