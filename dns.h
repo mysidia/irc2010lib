@@ -7,9 +7,10 @@ void IRC(dns_init)();
 struct _dnscallEnt;
 struct _dnsquery;
 
-typedef int DnsCallBack (struct _dnsquery*, char *result);
+typedef int DnsCallBack (struct _dnsquery*, char *result, void *data);
 
 struct _dnscallEnt{
+	void *data;
 	DnsCallBack *ptr;
 	LIST_ENTRY(_dnscallEnt) call_lst;
 };

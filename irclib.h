@@ -128,6 +128,7 @@ struct _ircsocket
 	struct event *theEvent;
 	struct timeval tv;
 	struct in_addr addr;
+	char *tailBuf;
 
 	IrcLibSocketBuf inBuf;
 	IrcLibSocketBuf outBuf;
@@ -137,6 +138,7 @@ struct _ircsocket
 	char __event__[sizeof(struct event *)];
 	char __tv__[sizeof(struct timeval)];
 	char __addr__[sizeof(struct in_addr)];
+	char __tailBuf__[sizeof(char *)];
 	char __inbuf__[sizeof(IrcLibSocketBuf)];
 	char __outbuf__[sizeof(IrcLibSocketBuf)];
 #endif

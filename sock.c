@@ -206,12 +206,19 @@ IrcLibReadPackets(IrcSocket *ptrLink)
 	char sockbuf[8192], *b;
 	int k, kt = 0;
 
-	k = read(ptrLink->fd, sockbuf, 8192);
+	if (ptrLink->tailBuf == NULL)
+		k = read(ptrLink->fd, sockbuf, 8192);
 
 	while(k > 0)
 	{
-		kt += k;
-		b = IrcLibShove(&ptrLink->inBuf, sockbuf, k);
+		if (ptrLink->tailBuf == NULL) {
+			kt += k;
+			b = IrcLibShove(&ptrLink->inBuf, sockbuf, k);
+		}
+		else {
+			b = ptrLink->tailBuf;
+			kt = strlen(ptrLink->tailBuf);
+		}
 
 		if (b && *b) {
 			int len;
@@ -223,11 +230,25 @@ IrcLibReadPackets(IrcSocket *ptrLink)
 				return -1;
 
 			k = read(ptrLink->fd, sockbuf + len, 8192 - len);
-			if (k > 0)
+			if (k > 0) {
 				k += len;
+				b = NULL;
+
+				if (ptrLink->tailBuf) {
+					free(ptrLink->tailBuf);
+					ptrLink->tailBuf = NULL;
+				}
+			}
 		}
 		else
 			k = read(ptrLink->fd, sockbuf, 8192);
+	}
+
+	if (b && *b) {
+		ptrLink->tailBuf = strdup(b);
+	
+		if (ptrLink->tailBuf == NULL)
+			abort();
 	}
 
 	if (k == 0)
