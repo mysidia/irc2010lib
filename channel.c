@@ -228,7 +228,7 @@ IrcChannel *IrcFindChannelHash ( IRC(ChannelName) *cn )
 {
 	if (chanHash == 0)
 		return 0;
-	return ilHashFind(chanHash, cn);
+	return ilHashFind(chanHash, cn->name);
 }
 
 void IrcDelChannelHash ( IrcChannel *cl )

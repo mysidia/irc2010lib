@@ -1,4 +1,4 @@
-/* $Id: hash.h,v 1.4 2002/01/06 08:12:31 mysidia Exp $ */
+/* $Id: hash.h,v 1.5 2002/01/06 08:27:06 mysidia Exp $ */
 
 /*
  *  Hash Table Header
@@ -49,14 +49,14 @@ struct _irc_hash_bucket
 struct _irc_hash_table
 {
 	struct _irc_hash_bucket **table;
-	const char (* get_key)(void *item);
+	const char* (* get_key)(void *item);
 	int size;
 };
 
 typedef struct _irc_hash_table ilHashTable;
 
 
-ilHashTable *ilNewHashTable(int size, const char (* getKeyPred)(void*));
+ilHashTable *ilNewHashTable(int size, const char* (* getKeyPred)(void*));
 ilHashTable *ilRehashTable(ilHashTable *, int newsize);
 ilHashTable *ilEmptyHashTable(ilHashTable *);
 ilHashTable *ilFreeHashTable(ilHashTable *);

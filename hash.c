@@ -44,7 +44,7 @@ IRCHashKey(char *datum)
 
 
 
-ilHashTable *ilNewHashTable(int size, const char (* get_key)(void*)) {
+ilHashTable *ilNewHashTable(int size, const char* (* get_key)(void*)) {
 	struct _irc_hash_table *ht;
 
 	ht = oalloc(sizeof(struct _irc_hash_table));
@@ -68,7 +68,39 @@ ilHashTable *ilFreeHashTable(ilHashTable *ht) {
 	return NULL;
 }
 
+int irc_strcmp_hash(const char *left, const char *right) {
+	char l, r;
+	int i;
+
+	for(i = 0; left[i] && right[i]; i++) {
+		l = tolower(left[i]);
+		r = tolower(right[i]);
+
+		if (l == r)
+			continue;
+		if (l < r)
+			return -1;
+		return 1;
+	}
+	return left[i] ? 1 : right[i] ? -1 : 0;
+}
+
 void *ilHashFind(ilHashTable*ht, char *key) {
+	int i = 0;
+	struct _irc_hash_entry *he;
+
+	i = IRCHashKey(key) % ht->size;
+
+	if (ht->table[i] == 0 || ht->table[i]->first == 0)
+			return 0;
+
+	for(he = ht->table[i]->first; he; he = he->next) {
+		const char *c = ht->get_key(he->item);
+
+		if (c != 0 && irc_strcmp_hash(key, c) == 0)
+			return he;
+	}
+	return 0;
 }
 
 void *ilHashDel(ilHashTable*ht, void *data) {
