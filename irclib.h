@@ -268,6 +268,7 @@ extern time_t CTime;
 #define IrcLibPop	IrcLib_pop
 #define IrcListener	IRC(Listener)
 #define IrcSocket	IRC(Socket)
+#define IrcDnsQuery	IRC(dns_query)
 
 #ifndef __IDSTRING
 

@@ -18,9 +18,9 @@
 #include "irclib.h"
 #include "dns.h"
 #include <assert.h>
-ID("$Id: stest.c,v 1.14 2001/12/29 22:25:51 mysidia Exp $");
+ID("$Id: stest.c,v 1.15 2004/03/17 18:32:10 mysidia Exp $");
 
-IRC(Socket) *testCli;
+IrcSocket *testCli;
 
 int Test(IrcSocket *cl)
 {
@@ -38,7 +38,7 @@ int Test(IrcSocket *cl)
 	lasttime = time(NULL);
 }
 
-int funFin ( IRC(dns_query)*q, char *r, void *d )
+int funFin ( IrcDnsQuery *q, char *r, void *d )
 {
 	if (d)
 		printf("DNS: %s -> %s\n", q->ip, r);
@@ -48,7 +48,7 @@ int funFin ( IRC(dns_query)*q, char *r, void *d )
 }
 
 
-int conDone( IRC(Socket) * sock, int errcode )
+int conDone( IrcSocket *sock, int errcode )
 {
 	if (errcode)
 		printf("Connection %d\n", errcode);
