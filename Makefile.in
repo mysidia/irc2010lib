@@ -13,7 +13,7 @@
 
 @SET_MAKE@
 
-# $Id: Makefile.in,v 1.14 2001/10/31 01:23:19 mysidia Exp $
+# $Id: Makefile.in,v 1.15 2001/11/01 22:38:45 mysidia Exp $
 #
 #
 
@@ -137,9 +137,9 @@ LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 CFLAGS = @CFLAGS@
 DIST_SOURCES = $(libirc_la_SOURCES) $(ctest_SOURCES) $(stest_SOURCES)
 DIST_COMMON = README AUTHORS COPYING ChangeLog INSTALL Makefile.am \
-	Makefile.in NEWS aclocal.m4 config.guess config.sub configure \
-	configure.in depcomp install-sh ltconfig ltmain.sh missing \
-	mkinstalldirs
+	Makefile.in NEWS THANKS aclocal.m4 config.guess config.sub \
+	configure configure.in depcomp install-sh ltconfig ltmain.sh \
+	missing mkinstalldirs
 SOURCES = $(libirc_la_SOURCES) $(ctest_SOURCES) $(stest_SOURCES)
 
 all: all-am
@@ -157,7 +157,7 @@ distclean-libtool:
 	-rm -f libtool
 $(srcdir)/Makefile.in:  Makefile.am  $(top_srcdir)/configure.in $(ACLOCAL_M4)
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  Makefile
+	  $(AUTOMAKE) --gnits  Makefile
 Makefile:  $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) && \
 	  CONFIG_HEADERS= CONFIG_LINKS= \
@@ -302,6 +302,11 @@ distdir = $(PACKAGE)-$(VERSION)
 GZIP_ENV = --best
 
 distdir: $(DISTFILES)
+	@if sed 15q $(srcdir)/NEWS | fgrep -e "$(VERSION)" >/dev/null; \
+	then :; else \
+	  echo "NEWS not updated; not releasing" 1>&2; \
+	  exit 1; \
+	fi
 	-chmod -R a+w $(distdir) >/dev/null 2>&1; rm -rf $(distdir)
 	mkdir $(distdir)
 	@for file in $(DISTFILES); do \

@@ -23,3 +23,19 @@
  *  covered by the GNU General Public License.
  *
  */
+
+/**
+ * This is where the actual IRC server handling mechanism
+ * interfaces should go.  To some degree, server.c should
+ * implement a working IRC server except with a large number
+ * of event/callback mechanisms to be handled by the user
+ * of the library.
+ *
+ * server.c will implement the protocol itself, other parts of the
+ * library sockets and dns, and mechanisms for internal structure
+ * too.
+ *
+ * the user of the library will be responsible for coordination of
+ * high-level things like dealing with messages once they are handled
+ * though possibly using utilities in the library itself to do that.
+ */
