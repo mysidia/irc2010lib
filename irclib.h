@@ -103,6 +103,7 @@
 
 int match(const char*, const char*);
 void *oalloc(size_t);
+char *str_dup(const char *);
 
 #define SOCKBUFSIZE 1024
 #define IRCBUFSIZE 512

@@ -26,6 +26,32 @@
 #include "irclib.h"
 #include "channel.h"
 
+
+/**********************************************************************/
+
+char * IRC(ChanCgetName) (IRC(ChannelName) *cn)
+{
+	return ( cn )->name;
+}
+
+void IRC(ChanCsetName) (IRC(ChannelName) *cn, const char *str)
+{
+	if ( ( cn )->name )
+		free (( cn )->name);
+
+	if ( str )
+		cn->name = str_dup(str);
+	else
+		cn->name = NULL;
+}
+
+void IRC(ChanJoin) (IRC(ChannelName) *chan_name)
+{
+	IrcSend("JOIN %s" IEOL, IRC(ChanCgetName)(chan_name));
+}
+
+/**********************************************************************/
+
 #define BIT(x)	(1 << (x))
 
 static struct { char fl; int mask1, mask2; }

@@ -29,7 +29,7 @@
  */
 
 #include "irclib.h"
-ID("$Id: mem.c,v 1.5 2001/10/25 04:30:13 mysidia Exp $");
+ID("$Id: mem.c,v 1.6 2001/10/27 05:05:46 mysidia Exp $");
 
 /*! 
  * \fn void * oalloc (size_t size)
@@ -60,3 +60,96 @@ void IrcFreeSocket(IrcSocket *q)
 	free(q);
 }
 
+
+
+/**
+ * \fn char *str_dup(const char *input)
+ * \param input String to duplicate
+ * \brief Allocates and returns a copy of the supplied string.
+ */
+char *
+str_dup(const char *input)
+{
+	char *buf;
+	int len;
+
+	for (buf = ((char *)(input)); *buf; buf++);
+	buf = (char *)((oalloc(1 + (len = (buf - input)))));
+	return (char *)(memcpy(buf, input, len + 1));
+}
+
+/*!
+ * \fn char *strn_dup(const char *input, int max)
+ * \param input String to duplicate
+ * \param max Maximum length of new string
+ * \brief Allocates and returns a copy of part of the supplied string.
+ */
+char *
+strn_dup(const char *input, int max)
+{
+	char *buf;
+	int len;
+
+	for (buf = ((char *)(input));
+		 *buf && ((buf - input) < max); buf++);
+	len = buf - input;
+	buf = (char *)(oalloc(1 + len));
+	buf[len] = '\0';
+	return (char *)memcpy(buf, input, len);
+}
+
+/**
+ * \pre  From points to a valid NUL-terminated character array, and
+ *       add is a reference to a character array to be changed.
+ *
+ * \post *Buf area is reallocated to contain its present state plus
+ *       the string specified as 'add'
+ */
+void AppendBuffer(char **buf, const char *add)
+{
+     char *newbuf, *x;
+
+     /* x = newbuf = new char[ ((buf && *buf ? strlen(*buf) : 0)) + strlen(add) + 4]; */
+
+     x = newbuf = (char *)oalloc(((*buf ? strlen(*buf) : 0)) + strlen(add) + 4);
+     if (!newbuf) return;
+     if (*buf)
+     {
+       bzero( newbuf, (*buf ? strlen( *buf ):0) + strlen(add) + 2 );
+       memcpy( newbuf, *buf, strlen(*buf) );
+       x = newbuf + strlen(*buf);
+     } else x = newbuf;
+     strcpy(x, add); /* this is ok */
+     if (*buf) {
+         free(*buf);
+     }
+     *buf = newbuf;
+     return;
+}
+
+
+/**
+ * \pre  From points to a valid NUL-terminated character array, and
+ *       add is a reference to a character array to be changed.
+ *
+ * \post *Buf area is reallocated to contain the string specified as
+ *       'new'
+ */
+void SetDynBuffer(char **buf, const char *newStr)
+{
+	char *newbuf, *x;
+
+	if (newStr) {
+		x = newbuf = (char *)oalloc(strlen(newStr) + 1);
+		if (!newbuf)
+			return;
+		strcpy(x, newStr);
+	}
+	else
+		newbuf = NULL;
+
+	if (*buf)
+		free(*buf);
+	*buf = newbuf;
+	return;
+}
