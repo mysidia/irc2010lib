@@ -208,6 +208,8 @@ IrcLibReadPackets(IrcSocket *ptrLink)
 
 	if (ptrLink->tailBuf == NULL)
 		k = read(ptrLink->fd, sockbuf, 8192);
+	else
+		k = 1;
 
 	while(k > 0)
 	{
@@ -217,7 +219,11 @@ IrcLibReadPackets(IrcSocket *ptrLink)
 		}
 		else {
 			b = ptrLink->tailBuf;
-			kt = strlen(ptrLink->tailBuf);
+			k = kt = strlen(ptrLink->tailBuf);
+			*sockbuf = '\0';
+
+			free(ptrLink->tailBuf);
+			ptrLink->tailBuf = NULL;
 		}
 
 		if (b && *b) {
@@ -233,15 +239,16 @@ IrcLibReadPackets(IrcSocket *ptrLink)
 			if (k > 0) {
 				k += len;
 				b = NULL;
-
-				if (ptrLink->tailBuf) {
-					free(ptrLink->tailBuf);
-					ptrLink->tailBuf = NULL;
-				}
 			}
 		}
-		else
+		else {
 			k = read(ptrLink->fd, sockbuf, 8192);
+
+			if (ptrLink->tailBuf) {
+				free(ptrLink->tailBuf);
+				ptrLink->tailBuf = NULL;
+			}
+		}
 	}
 
 	if (b && *b) {
