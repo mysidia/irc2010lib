@@ -33,9 +33,17 @@
 
 struct _irc_hash_table;
 
+struct _chan_mode_par {
+	char *value;
+};
+typedef struct _chan_mode_par IrcChannelModePar;
+
 struct _chanmode
 {
+	IrcChannelModePar	*modeparams;
 	long mode[2];
+
+	char paramCount;
 };
 typedef struct _chanmode IrcChannelMode;
 typedef struct _chanmode IRC(ChannelMode);
@@ -49,11 +57,11 @@ typedef struct _channame IRC(ChannelName);
 
 struct _chanhandle
 {
+	LIST_HEAD(,_chanuser)	*users;
 	IRC(ChannelName)	*channelName;
 	time_t			created;
 	time_t			lastTime;
 	IrcChannelMode		mode;
-	LIST_HEAD(,_chanuser)	*users;
 };
 typedef struct _chanhandle IrcChannel;
 

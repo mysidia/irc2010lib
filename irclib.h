@@ -178,6 +178,7 @@ struct _ircsocket
 	time_t lasttime;
 	struct _irclistener *port;
 	int (* func)(struct _ircsocket*, char *);
+	int (* readFunc)(struct _ircsocket*);
 	int (* periodic)(struct _ircsocket*);
 	int (* conn)(struct _ircsocket*, int);
 
@@ -223,6 +224,7 @@ void IRC(SocketAddEvents)(IRC(Socket) *theSocket);
 void IRC(ListenerAddEvents)(IRC(Listener) *);
 
 int IrcLibReadPackets(IRC(Socket) *ptrLink);
+int IrcLibReadBinary(IRC(Socket) *ptrLink);
 void IrcLibEventListener(int fd, short evType, void *p);
 void IrcLibEventSocket(int fd, short evType, void *p);
 void IrcLibEventFlushSockets(int fd, short evType, void *p);

@@ -31,7 +31,7 @@
 #include "irclib.h"
 #include <stddef.h>
 
-ID("$Id: sock.c,v 1.31 2001/11/17 06:38:10 mysidia Exp $");
+ID("$Id: sock.c,v 1.32 2002/01/15 18:09:23 mysidia Exp $");
 
 void IrcLibEventSocket(int fd, short evType, void *p);
 void IrcLibEventListener(int fd, short evType, void *p);
@@ -88,6 +88,8 @@ IrcSocket *IRC(socket_make)()
 
 	sockLink->fd = fd;
 	sockLink->func = IrcLibDefaultSockHandler;
+	sockLink->readFunc = IrcLibReadPackets;
+
 	sockLink->periodic = NULL;
 
 #ifdef LIST_ENTRY_INIT
@@ -161,6 +163,7 @@ IrcListener *IRC(MakeListener)(IrcSocket *theSocket)
 
 	port->sock = theSocket;
 	port->sock->func = IrcLibDefaultListenHandler;
+	port->sock->readFunc = IrcLibReadPackets;
 	port->sock->periodic = NULL;
 	port->sock->port = port;
 
@@ -287,6 +290,42 @@ IrcLibReadPackets(IrcSocket *ptrLink)
 }
 
 /**
+ * Read binary data
+ */
+int
+IrcLibReadBinary(IrcSocket *ptrLink)
+{
+	char sockbuf[8192], *b;
+	int k, kt = 0;
+
+	if (ptrLink->tailBuf != NULL) {
+		b = sockbuf;
+		strcpy(b, ptrLink->tailBuf);
+
+		free(ptrLink->tailBuf);
+		ptrLink->tailBuf = NULL;
+	}
+
+	k = read(ptrLink->fd, sockbuf, sizeof(sockbuf));
+
+	while(k > 0)
+	{
+		kt += k;
+		IRC(BufShoveBinary)(&ptrLink->inBuf, sockbuf, k);
+		k = read(ptrLink->fd, sockbuf, sizeof(sockbuf));
+	}
+
+	if (k == 0)
+		return -1;
+	if (k == -1) {
+		if (errno == EINTR || errno == EWOULDBLOCK)
+			return 0;
+		return -1;
+	}
+	return 0;
+}
+
+/**
  * @brief Fired on listener event
  */
 void
@@ -324,6 +363,10 @@ IrcLibEventListener(int fd, short evType, void *vI)
 			p->addr = sai.sin_addr;
 			p->port = li;
 			p->flags = IRCSOCK_ESTAB | IRCSOCK_INBOUND;
+			p->readFunc = IrcLibReadPackets;
+			p->func = IrcLibDefaultClientHandler;
+			p->parser = IrcLibDefaultClientTable;
+
 			(* li->sock->func)(p, "");
 //XXX debug
 			printf("Incoming link from %x\n", sai.sin_addr.s_addr);
@@ -419,7 +462,7 @@ IrcLibEventSocket(int fd, short evType, void *p)
 			}
 		}
 
-		if (IrcLibReadPackets(q) < 0)
+		if (((* q->readFunc)(q)) < 0)
 		{
 	//XXX debug
 			printf("Lost link from %x\n", q->addr.s_addr);
@@ -429,7 +472,7 @@ IrcLibEventSocket(int fd, short evType, void *p)
 			return;
 		}
 
-		while (IRC(BufDeQueue)(&q->inBuf, buf, 0)) {
+		while (IRC(BufDeQueue)(&q->inBuf, buf, q->readFunc == IrcLibReadPackets ? 0 : 2)) {
 			if ( (* q->func)(q, buf) < 0 ) {
 				close(q->fd);
 				IrcLibdelCon(q);
@@ -574,6 +617,27 @@ IRC(BufShove)(IrcBuf *t, char *textIn, size_t textLen)
 	return "";
 }
 
+
+char *
+IRC(BufShoveBinary)(IrcBuf *t, char *textIn, size_t textLen)
+{
+	BufQel *z;
+
+	z = (BufQel *)oalloc(sizeof(BufQel) + textLen);
+	z->len = textLen;
+	z->text = (char *)oalloc(textLen + 1);
+	strcpy(z->text, textIn);
+
+	if (t->firstEls == NULL)
+		t->firstEls = t->lastEls = z;
+	else
+		{
+			t->lastEls->next = z;
+			t->lastEls = z;
+		}
+	return textIn;
+}
+
 /**
  * @brief Get buffered text and place it in cmd.
  * @param Buffer to place text in
@@ -604,23 +668,26 @@ IRC(BufDeQueue)(IrcBuf *t, char cmd[IRCBUFSIZE], int sendcr)
 	strncpy(cmd, f->text, IRCBUFSIZE);
 	cmd[IRCBUFSIZE - 1] = '\0';
 
-	cp = cmd + strlen(cmd) - 1;
-
-	if (*cp == '\n' || *cp == '\r')
-		*cp = '\0';
-
-	if ((cp - 1) > cmd && (cp[-1] == '\r' || cp[-1] == '\n')) {
-		cp--;
-		*cp = '\0';
-	}
-
-	if (sendcr) {
-		if (*cp != '\0')
-			cp++;
-		while((cp - cmd) >= (IRCBUFSIZE - 3))
+	if (sendcr != 2)
+	{
+		cp = cmd + strlen(cmd) - 1;
+	
+		if (*cp == '\n' || *cp == '\r')
+			*cp = '\0';
+	
+		if ((cp - 1) > cmd && (cp[-1] == '\r' || cp[-1] == '\n')) {
 			cp--;
-		*cp = '\r';
-		*cp++ = '\n';
+			*cp = '\0';
+		}
+
+		if (sendcr) {
+			if (*cp != '\0')
+				cp++;
+			while((cp - cmd) >= (IRCBUFSIZE - 3))
+				cp--;
+			*cp = '\r';
+			*cp++ = '\n';
+		}
 	}
 
 	free(f->text);
@@ -651,7 +718,7 @@ IrcBufMakeEmpty(IrcBuf *t)
 {
 	char cmd[1025];
 
-	while(IRC(BufDeQueue)(t, cmd, 0))
+	while(IRC(BufDeQueue)(t, cmd, 2))
 		return;
 }
 
