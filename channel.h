@@ -31,6 +31,8 @@
 
 #define IEOL "\r\n"
 
+struct _irc_hash_table;
+
 struct _chanmode
 {
 	long mode[2];
@@ -55,7 +57,7 @@ struct _chanhandle
 };
 typedef struct _chanhandle IrcChannel;
 
-void IrcAddChannel ( ilHashTable**, IrcChannel *cl );
-IrcChannel *IrcFindChannel ( ilHashTable**, IRC(ChannelName) *cn );
-void IrcDelChannel ( ilHashTable**, IrcChannel *cl );
+void IrcAddChannel ( struct _irc_hash_table**, IrcChannel *cl );
+IrcChannel *IrcFindChannel ( struct _irc_hash_table**, IRC(ChannelName) *cn );
+void IrcDelChannel ( struct _irc_hash_table**, IrcChannel *cl );
 
