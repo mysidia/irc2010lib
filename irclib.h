@@ -118,6 +118,7 @@
 int match(const char*, const char*);
 void *oalloc(size_t);
 char *str_dup(const char *);
+void str_free(char *s);
 
 struct IRC(_Message);
 struct _ircsocket;

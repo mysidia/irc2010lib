@@ -29,7 +29,7 @@
  */
 
 #include "irclib.h"
-ID("$Id: mem.c,v 1.7 2002/01/30 02:30:48 mysidia Exp $");
+ID("$Id: mem.c,v 1.8 2002/12/16 23:55:49 mysidia Exp $");
 
 /*! 
  * \fn void * oalloc (size_t size)
@@ -155,4 +155,9 @@ void SetDynBuffer(char **buf, const char *newStr)
 		free(*buf);
 	*buf = newbuf;
 	return;
+}
+
+
+void str_free(char *s) {
+	free(s);
 }
