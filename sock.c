@@ -23,9 +23,15 @@
  *  covered by the GNU General Public License.
  *
  */
+/**
+ * @file sock.c
+ * @brief Socket Utilities
+ */
 
 #include "irclib.h"
 #include <stddef.h>
+
+ID("$Id: sock.c,v 1.23 2001/10/25 04:30:13 mysidia Exp $");
 
 void IrcLibEventSocket(int fd, short evType, void *p);
 void IrcLibEventListener(int fd, short evType, void *p);

@@ -29,4 +29,8 @@ struct _dnsquery
 typedef struct _dnsquery IRC(dns_query);
 typedef struct _dnscallent IRC(dns_call);
 
+
+int query_dns(int rev, char *, DnsCallBack*, void *);
+
+
 #endif

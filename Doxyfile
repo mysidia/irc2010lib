@@ -295,7 +295,7 @@ WARN_FORMAT            =
 # and error messages should be written. If left blank the output is written 
 # to stderr.
 
-WARN_LOGFILE           = docs/doxy.warn
+WARN_LOGFILE           = doc/doxy.warn
 
 #---------------------------------------------------------------------------
 # configuration options related to the input files
@@ -306,7 +306,7 @@ WARN_LOGFILE           = docs/doxy.warn
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = ./ options.h.in
+INPUT                  = ./
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
@@ -337,7 +337,7 @@ EXCLUDE_PATTERNS       =
 # directories that contain example code fragments that are included (see 
 # the \include command).
 
-EXAMPLE_PATH           = ./docs/ex
+EXAMPLE_PATH           = ./doc/ex
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the 
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
@@ -350,7 +350,7 @@ EXAMPLE_PATTERNS       = *.cc *.c *.h
 # directories that contain image that are included in the documentation (see 
 # the \image command).
 
-IMAGE_PATH             = ./docs/img
+IMAGE_PATH             = ./doc/img
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should 
 # invoke to filter for each input file. Doxygen will invoke the filter program 
@@ -409,20 +409,20 @@ HTML_OUTPUT            =
 # each generated HTML page. If it is left blank doxygen will generate a 
 # standard header.
 
-HTML_HEADER            = docs/gen/header.html
+HTML_HEADER            = doc/gen/header.html
 
 # The HTML_FOOTER tag can be used to specify a personal HTML footer for 
 # each generated HTML page. If it is left blank doxygen will generate a 
 # standard footer.
 
-HTML_FOOTER            = docs/gen/footer.html
+HTML_FOOTER            = doc/gen/footer.html
 
 # The HTML_STYLESHEET tag can be used to specify a user defined cascading 
 # style sheet that is used by each HTML page. It can be used to 
 # fine-tune the look of the HTML output. If the tag is left blank doxygen 
 # will generate a default style sheet
 
-HTML_STYLESHEET        = docs/gen/stylesheet.css
+HTML_STYLESHEET        = doc/gen/stylesheet.css
 
 # If the HTML_ALIGN_MEMBERS tag is set to YES, the members of classes, 
 # files or namespaces will be aligned in HTML using tables. If set to 
@@ -667,18 +667,15 @@ INCLUDE_FILE_PATTERNS  =
 # or name=definition (no spaces). If the definition and the = are 
 # omitted =1 is assumed.
 
-PREDEFINED             = 
+PREDEFINED             = _DOXYGEN
 
 # If the MACRO_EXPANSION and EXPAND_PREDEF_ONLY tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 
 # The macro definition that is found in the sources will be used. 
 # Use the PREDEFINED tag if you want to use a different macro definition.
 
-EXPAND_AS_DEFINED      = NCMD
-EXPAND_AS_DEFINED     += MCMD
-EXPAND_AS_DEFINED     += OCMD
-EXPAND_AS_DEFINED     += ICMD
-EXPAND_AS_DEFINED     += GCMD
+EXPAND_AS_DEFINED      = ID
+EXPAND_AS_DEFINED     += IRC
 
 #---------------------------------------------------------------------------
 # Configuration::addtions related to external references   

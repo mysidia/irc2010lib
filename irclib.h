@@ -26,6 +26,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+/**
+ * @file irclib.h
+ * @brief Library Header
+ */
 
 #if 1
 
@@ -197,3 +201,19 @@ int IRC(match)(const char *mask, const char *string);
 #define IrcListener	IRC(Listener)
 #define IrcSocket	IRC(Socket)
 
+
+#define __IDSTRING(name, string) \
+	static const char name[] = string
+//	static const char name[] __attribute__((__unused__)) = (string)
+
+#ifndef __RCSID
+#ifdef _DOXYGEN
+#define ID(x) __RCSID(x);
+#else
+#define ID(x) \
+	__RCSID(x); \
+	static void use_rcsid() { rcsid; }
+#endif
+#define __RCSID(s) __IDSTRING(rcsid, s)	
+#define __USEVAR(s) __IDSTRING(s, "(null)")
+#endif

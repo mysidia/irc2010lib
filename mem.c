@@ -23,8 +23,13 @@
  *  covered by the GNU General Public License.
  *
  */
+/**
+ * @file mem.c
+ * @brief Memory Management/Utilities
+ */
 
 #include "irclib.h"
+ID("$Id: mem.c,v 1.5 2001/10/25 04:30:13 mysidia Exp $");
 
 /*! 
  * \fn void * oalloc (size_t size)

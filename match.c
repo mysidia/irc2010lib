@@ -23,9 +23,13 @@
  *  covered by the GNU General Public License.
  *
  */
+/**
+ * @file match.c
+ * @brief Pattern matching
+ */
 
 #include "irclib.h"
-
+ID("$Id: match.c,v 1.3 2001/10/25 04:30:13 mysidia Exp $");
 
 /**
  *  \fn int match(const char *mask, const char *string)
@@ -42,9 +46,6 @@
  *  Wildcards can be escaped with a preceding \\ (backslash).
  *
  *  \return 0 if it matches, 1 if it does not match.
- *
- *  \bug match() comes from ircd, it is GPL'ed and services can't be \
- *      distributed while it remains.
  *
  */
 
@@ -170,3 +171,6 @@ IRC(match)(const char *mask, const char *string)
                 }
         }
 }
+
+/**********************************************************************/
+

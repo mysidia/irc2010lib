@@ -23,8 +23,14 @@
  *  covered by the GNU General Public License.
  *
  */
+/**
+ * @file dns.c
+ * @brief Resolver Handler
+ */
+
 #include "irclib.h"
 #include "dns.h"
+ID("$Id: dns.c,v 1.5 2001/10/25 04:30:13 mysidia Exp $");
 
 static adns_state dns_state;
 static LIST_HEAD(, _dnsquery) queries;
@@ -129,4 +135,52 @@ int query_dns(int reverse, char *host, DnsCallBack *func, void *data)
 
 void check_dns()
 {
+	char ip[256];
+	char host[256];
+	adns_answer *ans;
+	void        *ctx;
+	int         v = 0;
+	struct descriptor_data *d;
+
+	IRC(dns_query) *req, *req_next;
+	IRC(dns_call) *call, *call_next;
+	int found = 0;
+
+	for(req = queries.lh_first; req; req = req_next)
+	{
+		req_next = req->query_lst.le_next;
+		ctx = NULL;
+		ans = NULL;
+
+		v = adns_check(dns_state, &req->query, &ans, &ctx);
+
+		if (!ans || ans->type == adns_r_none)
+			continue;
+
+		LIST_REMOVE(req, query_lst);
+
+		if (!ans->nrrs || ans->status == adns_s_nodata || ans->status == adns_s_nxdomain)
+		{
+/////////////// Failed
+			for(call = req->calls.lh_first; call; call = call->call_lst.le_next)
+			{
+			}
+		}
+
+		/* ip -> host */
+		sprintf(ip, "%.100s", req->ip);
+		sprintf(host, "%.100s", ans->rrs.str[0]);
+
+
+//////////////// Succeed
+		for(call = req->calls.lh_first; call; call = call_next)
+		{
+			call_next = call->call_lst.le_next;
+
+			(* call->func)(req, ans->rrs.str[0], ans);
+			LIST_REMOVE(call, call_lst);
+			free(call);
+		}
+		free(req);
+	}
 }

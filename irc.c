@@ -23,9 +23,15 @@
  *  covered by the GNU General Public License.
  *
  */
+/** 
+ *  @file irc.c
+ *  @brief IRC primary interface
+ */
+
 #include "irclib.h"
 #include "dns.h"
 
+ID("$Id: irc.c,v 1.6 2001/10/25 04:30:13 mysidia Exp $");
 time_t CTime;
 
 void LibIrcInit()

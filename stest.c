@@ -1,4 +1,5 @@
 #include "irclib.h"
+#include "dns.h"
 #include <assert.h>
 
 int Test(IrcSocket *cl)
@@ -17,6 +18,13 @@ int Test(IrcSocket *cl)
 	lasttime = time(NULL);
 }
 
+int funFin ( IRC(dns_query)*q, char *r, void *d )
+{
+	printf("--%s--\n", r);
+///
+}
+
+
 int main()
 {
 	IRC(Socket) *p;
@@ -24,7 +32,6 @@ int main()
 	struct in_addr addr;
 
 	LibIrcInit();
-
 	p = IRC(socket_make)();
 
 	if (p == NULL)
@@ -41,7 +48,8 @@ int main()
 	IRC(ListenerAddEvents)(q);
 
 	q->sock->periodic = Test;
-	
+
+	query_dns(1, "127.0.0.1", funFin, NULL);	
 	IRC(SystemLoop)();
 
 //	sleep (6000);
