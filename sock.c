@@ -206,30 +206,31 @@ IrcLibReadPackets(IrcSocket *ptrLink)
 	char sockbuf[8192], *b;
 	int k, kt = 0;
 
-	if (ptrLink->tailBuf == NULL)
-		k = read(ptrLink->fd, sockbuf, 8192);
-	else
-		k = 1;
+	if (ptrLink->tailBuf != NULL) {
+		b = sockbuf;
+		strcpy(b, ptrLink->tailBuf);
+
+		free(ptrLink->tailBuf);
+		ptrLink->tailBuf = NULL;
+
+		if (*sockbuf != '\0')
+			goto tailbuf;
+	}
+
+	k = read(ptrLink->fd, sockbuf, 8192);
 
 	while(k > 0)
 	{
-		if (ptrLink->tailBuf == NULL) {
-			kt += k;
-			b = IrcLibShove(&ptrLink->inBuf, sockbuf, k);
-		}
-		else {
-			b = ptrLink->tailBuf;
-			k = kt = strlen(ptrLink->tailBuf);
-			*sockbuf = '\0';
+		kt += k;
+		b = IrcLibShove(&ptrLink->inBuf, sockbuf, k);
 
-			free(ptrLink->tailBuf);
-			ptrLink->tailBuf = NULL;
-		}
+		tailbuf:
 
 		if (b && *b) {
 			int len;
 
-			strcpy(sockbuf, b);
+			if (b != sockbuf)
+				strcpy(sockbuf, b);
 			len = strlen(b);
 
 			if (len >= SOCKBUFSIZE)
@@ -243,11 +244,6 @@ IrcLibReadPackets(IrcSocket *ptrLink)
 		}
 		else {
 			k = read(ptrLink->fd, sockbuf, 8192);
-
-			if (ptrLink->tailBuf) {
-				free(ptrLink->tailBuf);
-				ptrLink->tailBuf = NULL;
-			}
 		}
 	}
 
@@ -367,7 +363,7 @@ IrcLibEventSocket(int fd, short evType, void *p)
 				IrcFreeSocket(q);
 				return;
 			}
-		}	
+		}
 	}
 
 	if ((evType & EV_TIMEOUT) || (evType & EV_READ)) 
@@ -419,13 +415,16 @@ struct _ircbq {
 
 typedef struct _ircbq BufQel;
 
+/////////////
+
 /**
  * @internal
  * @brief Called by shove() to push a piece of the message
  *        before a \\n onto the buffer.
  */
 static char *
-qPush(IrcBuf *t, char *text, char *sep) {
+qPush(IrcBuf *t, char *text, char *sep)
+{
 	BufQel *z;
 
 	z = (BufQel *)oalloc(sizeof(BufQel) + (sep - text + 1));
@@ -474,8 +473,10 @@ IrcLibShove(IrcBuf *t, char *textIn, size_t textLen)
 	char *text = textIn;
 
 	for(p = text; p < (textIn + textLen); p++) {
-		if (*p == '\n' || (*p == '\r' && p[1] == '\n')) {
-			if (*p == '\r')
+//		if (*p == '\n' || (*p == '\r' && p[1] == '\n')) {
+//			if (*p == '\r')
+		if (*p == '\n' || *p == '\r') {
+			while((p<(textIn+textLen))&&(*p=='\r'||*p=='\n'))
 				p++;
 			text = qPush(t, text, p);
 		}
@@ -496,7 +497,8 @@ IrcLibShove(IrcBuf *t, char *textIn, size_t textLen)
  *        fill cmd, and be removed from the buffer.
  */
 int
-IrcLib_pop(IrcBuf *t, char cmd[IRCBUFSIZE], int sendcr) {
+IrcLib_pop(IrcBuf *t, char cmd[IRCBUFSIZE], int sendcr)
+{
 	BufQel *f;
 	char *cp;
 

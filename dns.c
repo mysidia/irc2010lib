@@ -29,6 +29,9 @@
 static adns_state dns_state;
 static LIST_HEAD(, _dnsquery) queries;
 
+void IrcLibEventDNSProcess(int fd, short evType, void *pData);
+void check_dns();
+
 void IRC(dns_init)()
 {
 	int errv;
@@ -38,6 +41,23 @@ void IRC(dns_init)()
 		perror("adns_init");
 		exit(0);
 	}
+
+	IrcLibEventDNSProcess(0, 0, &dns_state);
+}
+
+void IrcLibEventDNSProcess(int fd, short evType, void *pData)
+{
+	static struct event ev;
+	static struct timeval tv;
+
+	adns_processany(*(adns_state *)pData);
+
+	tv.tv_sec = 1;
+	tv.tv_usec = 0;
+
+	event_set(&ev, 0, EV_TIMEOUT, IrcLibEventDNSProcess, &dns_state);
+	event_add(&ev, &tv);
+	check_dns();
 }
 
 char *ip2ptr(char *host)
@@ -53,9 +73,11 @@ char *ip2ptr(char *host)
     return buf;
 }
 
-int query_dns(char *host, DnsCallBack *func)
+int query_dns(int reverse, char *host, DnsCallBack *func, void *data)
 {
 	IRC(dns_query) *query;
+	IRC(dns_call) *newCall;
+	int found = 0;
 
 	if (!host || !*host)
 		return -1;
@@ -64,20 +86,31 @@ int query_dns(char *host, DnsCallBack *func)
 	for(query = queries.lh_first; query; query = query->query_lst.le_next)
 		if (strcasecmp(query->ip, host) == 0)
 			break;
-
-//XXX callback should be a list, if query exists, callback should be added
-//  to the query.
 	if (query)
-		return 0;
+		found = 1;
 
 	do {
-		query = oalloc(sizeof(IRC(dns_query)));
+		if (found == 0)
+			query = oalloc(sizeof(IRC(dns_query)));
+
+		if (query) {
+			newCall = oalloc(sizeof(IRC(dns_call)));
+			newCall->func = func;
+			newCall->data = data;
+			LIST_INSERT_HEAD(&query->calls, newCall, call_lst);
+
+			if (found != 0)
+				return 0;
+		}
 
 		query->ip = oalloc(strlen(host)+1);
 		strcpy(query->ip, host);
 
-		if (adns_submit(dns_state, ip2ptr(host), adns_r_ptr,
-			adns_qf_owner|adns_qf_cname_loose, query, &query->query))
+		if (reverse ? adns_submit(dns_state, ip2ptr(host), adns_r_ptr,
+			adns_qf_owner|adns_qf_cname_loose, query, &query->query) :
+
+			adns_submit(dns_state, host, adns_r_addr, adns_qf_owner|adns_qf_cname_loose, query, &query->query)
+		    )
 		{
 			perror("adns_submit");
 			if (query->ip)
@@ -89,6 +122,10 @@ int query_dns(char *host, DnsCallBack *func)
 		LIST_INSERT_HEAD(&queries, query, query_lst);
 	} while(0);
 
-//	check_dns();
+	check_dns();
 	return 0;
+}
+
+void check_dns()
+{
 }
