@@ -24,13 +24,14 @@
  *
  */
 #include "irclib.h"
-#include <event.h>
+#include "dns.h"
 
 time_t CTime;
 
 void LibIrcInit()
 {
 	event_init();
+	IRC(dns_init)();
 }
 
 
