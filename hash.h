@@ -1,4 +1,4 @@
-/* $Id: hash.h,v 1.1 2001/11/17 06:38:10 mysidia Exp $ */
+/* $Id: hash.h,v 1.2 2001/12/16 09:53:25 mysidia Exp $ */
 
 /*
  *  Hash Table Header
@@ -32,3 +32,29 @@
 
 #include <stddef.h>
 
+struct _hash_entry;
+struct _hash_bucket;
+
+struct _hash_entry
+{
+        void *item;
+        struct _hash_bucket *next;
+};
+
+struct _hash_table
+{
+	struct _hash_entry **table;
+	int size;
+};
+
+typedef struct _hash_table ilHashTable;
+
+
+ilHashTable *ilNewHashTable(int size);
+ilHashTable *ilRehashTable(ilHashTable *, int newsize);
+ilHashTable *ilEmptyHashTable(ilHashTable *);
+ilHashTable *ilFreeHashTable(ilHashTable *);
+
+void *ilHashFind(ilHashTable*, char *);
+void *ilHashDel(ilHashTable*, void *);
+void *ilHashAdd(ilHashTable*, char *, void*);

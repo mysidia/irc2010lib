@@ -31,9 +31,19 @@
 #include "irclib.h"
 #include "hash.h"
 
+struct _hash_bucket
+{
+	struct _hash_entry *first;
+};
+
 
 u_int32_t
 IRCHashKey(char *datum)
 {
+	u_int16_t hash = 0x7edcb;
+
+	while (*datum != '\0')
+		hash = tolower (*datum) ^ ((hash << 3) | (hash >> 13));
+
 	return 0;
 }
