@@ -204,6 +204,26 @@ void IrcLibModeSetMode(IrcChannelMode *q, const char *flagsToSet,
 	}
 }
 
+const char *IrcModeString(IrcChannelMode *v)
+{
+	static char resBuf[512];
+	char *p = resBuf;
+	int i = 0;
+
+	if (v->mode[0] == 0 && v->mode[1] == 0)
+		return strcpy(resBuf, "+");
+	*resBuf = '\0';
+
+	for(i = 0; IrcModeBitMap[i].fl; i++)
+	{
+		if (v->mode[0] & IrcModeBitMap[i].mask1)
+			*p++ = IrcModeBitMap[i].fl;
+		if (v->mode[1] & IrcModeBitMap[i].mask2)
+			*p++ = IrcModeBitMap[i].fl;
+	}
+	return resBuf;
+}
+
 /********************************************************************/
 
 const char *IrcChanHkeyPred(void *item) {
