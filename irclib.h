@@ -139,9 +139,15 @@ struct _ircbf
 typedef struct _ircbf IrcBuf;
 typedef struct _ircbf IrcLibSocketBuf;
 
+#ifdef _IRCLIB
+#define PRIV_MEM(type, var, ne) \
+		type var
+#define PRIV_MEM_AR(type, var, ne) \
+		type var[ne]
+#else
 #define PRIV_MEM(type, var, ne) \
 		type _##__LINE__##_var__ [ne]
-
+#endif
 
 struct IRC(_MsgTab)
 {
@@ -156,26 +162,14 @@ typedef struct IRC(_MsgTab) IRC(MsgTab);
  */
 struct _ircsocket
 {
-#ifdef _IRCLIB
-	int fd;
-	int flags;
-	struct event *theEvent;
-	struct timeval tv;
-	struct in_addr addr;
-	char *tailBuf;
-
-	IrcLibSocketBuf inBuf;
-	IrcLibSocketBuf outBuf;
-#else
-	PRIV_MEM(int,	fd,	1);
-	PRIV_MEM(int,	flags,	1);
-	PRIV_MEM(struct event*, theEvent, 1);
-	PRIV_MEM(struct timeval tv, 1);
-	PRIV_MEM(struct in_addr addr, 1);
-	PRIV_MEM(char*, tailBuf, 1);
-	PRIV_MEM(IrcLibSocketBuf, __inbuf__, 1);
-	PRIV_MEM(IrcLibSocketBuf, __outbuf__, 1);
-#endif
+	PRIV_MEM(int,			fd,		1);
+	PRIV_MEM(int,			flags,		1);
+	PRIV_MEM(struct event*,		theEvent,	1);
+	PRIV_MEM(struct timeval,	tv,		1);
+	PRIV_MEM(struct in_addr,	addr,		1);
+	PRIV_MEM(char*,			tailBuf,	1);
+	PRIV_MEM(IrcLibSocketBuf,	inBuf,		1);
+	PRIV_MEM(IrcLibSocketBuf,	outBuf,		1);
 
 	IRC(MsgTab)	*parser;
 
