@@ -86,10 +86,10 @@ am__include = @am__include@
 am__quote = @am__quote@
 install_sh = @install_sh@
 
-# $Id: Makefile.in,v 1.20 2002/10/12 01:23:59 mysidia Exp $
+# $Id: Makefile.in,v 1.21 2002/10/15 00:07:51 mysidia Exp $
 #
 #
-DEFS = -D_IRCLIB @DEFS@
+DEFS = -D_IRCLIB_INTERNAL @DEFS@
 
 bin_PROGRAMS = stest ctest sockmon
 stest_SOURCES = stest.c

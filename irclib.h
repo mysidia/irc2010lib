@@ -41,6 +41,11 @@
 
 #define IRC(x)	IrcLib##x
 
+#define IRCLIB_MMP(ma,mi,pl) \
+        (((ma) << 16) + ((mi) << 8) + (pl))
+
+#define _IRCLIB IRCLIB_MMP(0,0,2)
+
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -143,7 +148,7 @@ struct _ircbf
 typedef struct _ircbf IrcBuf;
 typedef struct _ircbf IrcLibSocketBuf;
 
-#ifdef _IRCLIB
+#ifdef _IRCLIB_INTERNAL
 #define PRIV_MEM(type, var, ne) \
 		type var
 #define PRIV_MEM_AR(type, var, ne) \

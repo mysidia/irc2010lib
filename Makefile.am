@@ -1,7 +1,7 @@
-# $Id: Makefile.am,v 1.12 2002/09/21 23:04:06 mysidia Exp $
+# $Id: Makefile.am,v 1.13 2002/10/15 00:07:51 mysidia Exp $
 #
 #
-DEFS = -D_IRCLIB @DEFS@
+DEFS = -D_IRCLIB_INTERNAL @DEFS@
 
 bin_PROGRAMS = stest ctest sockmon
 stest_SOURCES = stest.c
