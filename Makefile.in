@@ -13,7 +13,7 @@
 
 @SET_MAKE@
 
-# $Id: Makefile.in,v 1.16 2001/11/17 00:03:10 mysidia Exp $
+# $Id: Makefile.in,v 1.17 2001/11/17 06:38:10 mysidia Exp $
 #
 #
 
@@ -92,7 +92,7 @@ ctest_SOURCES = ctest.c
 ctest_LDADD = libirc.la -levent -ladns
 
 lib_LTLIBRARIES = libirc.la
-libirc_la_SOURCES = match.c mem.c sock.c server.c irc.c channel.c dns.c
+libirc_la_SOURCES = match.c mem.c sock.c server.c irc.c channel.c dns.c hash.c
 
 DISTCLEANFILES = config.guess config.sub ltconfig ltmain.sh libtool
 subdir = .
@@ -104,7 +104,7 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libirc_la_LDFLAGS =
 libirc_la_LIBADD =
 am_libirc_la_OBJECTS = match.lo mem.lo sock.lo server.lo irc.lo \
-	channel.lo dns.lo
+	channel.lo dns.lo hash.lo
 libirc_la_OBJECTS = $(am_libirc_la_OBJECTS)
 bin_PROGRAMS = stest$(EXEEXT) ctest$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
@@ -123,10 +123,10 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 @AMDEP_TRUE@DEP_FILES = $(DEPDIR)/channel.Plo $(DEPDIR)/ctest.Po \
-@AMDEP_TRUE@	$(DEPDIR)/dns.Plo $(DEPDIR)/irc.Plo \
-@AMDEP_TRUE@	$(DEPDIR)/match.Plo $(DEPDIR)/mem.Plo \
-@AMDEP_TRUE@	$(DEPDIR)/server.Plo $(DEPDIR)/sock.Plo \
-@AMDEP_TRUE@	$(DEPDIR)/stest.Po
+@AMDEP_TRUE@	$(DEPDIR)/dns.Plo $(DEPDIR)/hash.Plo \
+@AMDEP_TRUE@	$(DEPDIR)/irc.Plo $(DEPDIR)/match.Plo \
+@AMDEP_TRUE@	$(DEPDIR)/mem.Plo $(DEPDIR)/server.Plo \
+@AMDEP_TRUE@	$(DEPDIR)/sock.Plo $(DEPDIR)/stest.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -231,6 +231,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/channel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ctest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/dns.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/hash.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/irc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/match.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/mem.Plo@am__quote@

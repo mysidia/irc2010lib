@@ -31,7 +31,7 @@
 #include "irclib.h"
 #include <stddef.h>
 
-ID("$Id: sock.c,v 1.30 2001/11/17 04:41:55 mysidia Exp $");
+ID("$Id: sock.c,v 1.31 2001/11/17 06:38:10 mysidia Exp $");
 
 void IrcLibEventSocket(int fd, short evType, void *p);
 void IrcLibEventListener(int fd, short evType, void *p);
@@ -39,7 +39,8 @@ void IrcLibEventSockWrite(int fd, short evType, void *p);
 
 int IRCUnknown(IRC(Socket)*q, IRC(Message)*t)
 {
-	IrcSend(q, ":me NOTICE -you- :Bad command\r\n");
+	if (t->command)
+		IrcSend(q, "Unknown: [%s]\r\n", t->command);
 }
 
 IRC(MsgTab) IrcLibDefaultClientTable[] =
@@ -695,8 +696,6 @@ IrcLibDefaultClientHandler(IrcSocket *q, char *buf)
 		// for(i = 0; i < m.numarg; i++)
 		//	IrcSend(q, "[args.%i = %s]\r\n", i, m.args[i]);
 	}
-
-	IrcSend(q, "[%s]\r\n", buf);
 }
 
 
