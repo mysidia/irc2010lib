@@ -30,7 +30,7 @@
 
 #include "irclib.h"
 #include "dns.h"
-ID("$Id: dns.c,v 1.9 2001/10/31 01:02:26 mysidia Exp $");
+ID("$Id: dns.c,v 1.10 2001/11/01 22:31:07 mysidia Exp $");
 
 static adns_state dns_state;
 static LIST_HEAD(, _dnsquery) queries;
@@ -51,6 +51,9 @@ void IRC(dns_init)()
 	IrcLibEventDNSProcess(0, 0, &dns_state);
 }
 
+/**
+ * @brief Handle periodic DNS  events
+ */
 static void IrcLibEventDNSProcess(int fd, short evType, void *pData)
 {
 	static struct event ev;
@@ -66,6 +69,9 @@ static void IrcLibEventDNSProcess(int fd, short evType, void *pData)
 	check_dns();
 }
 
+/**
+ * @brief Convert an ip address to an in-addr.arpa for PTR lookup
+ */
 static char *ip2ptr(char *host)
 {
    static char buf[HOSTLEN + 25];
@@ -79,6 +85,14 @@ static char *ip2ptr(char *host)
     return buf;
 }
 
+/**
+ * @brief Post a DNS query
+ * @param reverse Reverse resolution or not?
+ * @param host Name of host to resolve (NUL-terminated char array)
+ * @param func DnsCallBack procedure to be called back on success or
+ *             failure.
+ * @param data Extra pointer to pass to func
+ */
 int query_dns(int reverse, char *host, DnsCallBack *func, void *data)
 {
 	IRC(dns_query) *query;
@@ -133,6 +147,9 @@ int query_dns(int reverse, char *host, DnsCallBack *func, void *data)
 	return 0;
 }
 
+/**
+ * @brief Check for resolved queries and queries in error
+ */
 static void check_dns()
 {
 	char ip[256];
