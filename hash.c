@@ -31,6 +31,9 @@
 #include "irclib.h"
 #include "hash.h"
 
+/**
+ * The default hashing function
+ */
 u_int32_t
 IrcDefaultHashKey(const char *datum)
 {
@@ -43,7 +46,9 @@ IrcDefaultHashKey(const char *datum)
 }
 
 
-
+/**
+ * Allocate a new hash table
+ */
 ilHashTable *ilNewHashTable(int size, const char* (* get_key)(void*)) {
 	struct _irc_hash_table *ht;
 
@@ -56,6 +61,9 @@ ilHashTable *ilNewHashTable(int size, const char* (* get_key)(void*)) {
 	return ht;
 }
 
+/**
+ * Rehash a hash table to a new size
+ */
 ilHashTable *ilRehashTable(ilHashTable *ht, int newsize) {
 	struct _irc_hash_table nt;
 	struct _irc_hash_entry *he;
@@ -85,6 +93,12 @@ ilHashTable *ilRehashTable(ilHashTable *ht, int newsize) {
 	return ht;
 }
 
+/**
+ * Wipe out all the records being held by the hash table
+ *
+ * This free()'s hash table management structures, but not
+ * user data
+ */
 ilHashTable *ilEmptyHashTable(ilHashTable *ht) {
 	struct _irc_hash_entry* hx;
 	int i = 0;
