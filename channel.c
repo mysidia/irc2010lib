@@ -251,7 +251,10 @@ IrcChannel *IrcFindChannel ( ilHashTable **chanHash, IRC(ChannelName) *cn )
 
 void IrcDelChannel ( ilHashTable **chanHash, IrcChannel *cl )
 {
-	(void)ilHashDel(*chanHash, cl);
+	int z = ilHashDel(*chanHash, cl);
+
+	if ( z == 0 )
+		abort();
 }
 
 /********************************************************************/
