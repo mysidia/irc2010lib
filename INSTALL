@@ -1,4 +1,10 @@
-$Id: INSTALL,v 1.1 2001/10/23 04:47:00 mysidia Exp $
+$Id: INSTALL,v 1.2 2001/10/24 06:02:27 mysidia Exp $
 
 Dependencies: libevent.
+Select/Polling library
 http://www.monkey.org/~provos/libevent-0.3d.tar.gz
+
+Dependencies: adns.
+Asychronous/Advanced Resolver library
+http://www.chiark.greenend.org.uk/~ian/adns/
+
