@@ -124,6 +124,7 @@ void str_free(char *s);
 
 struct Irc_Message;
 struct _ircsocket;
+struct Irc_session;
 
 #define SOCKBUFSIZE 1024
 #define IRCBUFSIZE 512
@@ -243,7 +244,7 @@ int IrcLibReadBinary(IrcSocket *ptrLink);
 void IrcLibEventListener(int fd, short evType, void *p);
 void IrcLibEventSocket(int fd, short evType, void *p);
 void IrcLibEventFlushSockets(int fd, short evType, void *p);
-char *IrcBufShove(IrcBuf *t, char *textIn, size_t textLen);
+char *IrcBufShove(IrcBuf *t, char *textIn, size_t textLen, size_t* rlen);
 int IrcBufDeQueue(IrcBuf *t, char cmd[IRCBUFSIZE], int);
 int IrcLibBufIsEmpty(IrcBuf *t);
 void IrcBufMakeEmpty(IrcBuf *t);
@@ -257,6 +258,9 @@ void IrcSend(IrcSocket *, const char *, ...);
 int IrcLibDefaultSockHandler(IrcSocket *, char *);
 int IrcLibDefaultListenHandler(IrcSocket *, char *);
 int IrcLibDefaultClientHandler(IrcSocket *, char *);
+struct Irc_session* Irc_session_make();
+void Ircsess_setinfo(struct Irc_session* ses, const char* nick, const char* user, const char* host, const char* real);
+
 
 void Ircsocket_connect
 	(IrcSocket*, int port, struct in_addr, int (*)(IrcSocket *, int));
@@ -264,6 +268,7 @@ void Ircsocket_connect
 int Ircmatch(const char *mask, const char *string);
 
 void IrcMakeMessage(IrcMessage*, char*);
+int IrcMessageText(IrcMessage*, char* buf, int len, int start, int end);
 
 extern time_t CTime;
 
@@ -298,10 +303,25 @@ struct Irc_modemap_st
 	int inuse, takes_arg;
 };
 
+struct _irc_chanhandle;
+struct _irc_userhandle
+{
+	LIST_HEAD(,_irc_chanhandle) *channels;
+	char*                   namp;
+	char*                   userp;
+	char*                   hostp;
+	char*                   realp;
+	char*			servp;
+	time_t                  login;
+	long                    modes[2];
+};
+
+
 struct Irc_session
 {
 	IrcSocket *sock;		/* Daemon socket */
 	ircHashTable *chanHash;	/* Channels */
+	struct _irc_userhandle userData;
 	struct Irc_modemap_st modemap[NUM_MODES + 1];
 	LIST_HEAD(, ircTimer)	timers;
 };

@@ -18,7 +18,7 @@
 #include "irclib.h"
 #include "dns.h"
 #include <assert.h>
-ID("$Id: stest.c,v 1.16 2004/03/28 07:59:14 mysidia Exp $");
+ID("$Id: stest.c,v 1.17 2004/03/28 09:58:52 mysidia Exp $");
 
 IrcSocket *testCli;
 
@@ -38,7 +38,7 @@ int Test(IrcSocket *cl)
 	lasttime = time(NULL);
 }
 
-int funFin ( IrcDnsQuery *q, char *r, void *d )
+int funFin ( IrcDnsQuery *q, char *r, void *d, void* x)
 {
 	if (d)
 		printf("DNS: %s -> %s\n", q->ip, r);
@@ -72,7 +72,7 @@ int main()
 
 	if (Ircsocket_bind(p, 3030, addr) < 0)
 		abort();
-	if ((q = IrcMakeListener(p) == NULL))
+	if ((q = IrcMakeListener(p)) == NULL)
 		abort();
 	printf("Listening on %d\n", 3030);
 

@@ -30,7 +30,7 @@
 
 #include "irclib.h"
 #include "dns.h"
-ID("$Id: dns.c,v 1.12 2004/03/28 07:59:14 mysidia Exp $");
+ID("$Id: dns.c,v 1.13 2004/03/28 09:58:52 mysidia Exp $");
 
 static adns_state dns_state;
 static LIST_HEAD(, _dnsquery) queries;
@@ -187,9 +187,9 @@ static void check_dns()
 				call_next = call->call_lst.le_next;
 
 				if (req->rev)
-					(* call->func)(req, host, NULL);
+					(* call->func)(req, host, NULL, call->data);
 				else
-					(* call->func)(req, ip, NULL);
+					(* call->func)(req, ip, NULL, call->data);
 				LIST_REMOVE(call, call_lst);
 				free(call);
 			}
@@ -217,9 +217,9 @@ static void check_dns()
 				call_next = call->call_lst.le_next;
 	
 				if (req->rev)
-					(* call->func)(req, host, ans);
+					(* call->func)(req, host, ans, call->data);
 				else
-					(* call->func)(req, ip, ans);
+					(* call->func)(req, ip, ans, call->data);
 	
 				LIST_REMOVE(call, call_lst);
 				free(call);

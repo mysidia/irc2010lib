@@ -39,22 +39,9 @@ struct _user_mode_par {
 };
 typedef struct _user_mode_par IrcUserModePar;
 
-struct _chanhandle;
+struct _irc_chanhandle;
 
-struct _nickname
-{
-	char	*namp;
-};
-typedef struct _nickname IrcNickName;
-
-struct _userhandle
-{
-	LIST_HEAD(,_chanhandle)	*channels;
-	IrcNickName		nick;
-	time_t			login;
-	long			modes[2];
-};
-typedef struct _chanhandle IrcUser;
+typedef struct _irc_userhandle IrcUser;
 
 /*void IrcAddChannel ( struct _irc_hash_table**, IrcChannel *cl );
 IrcChannel *IrcFindChannel ( struct _irc_hash_table**, IrcChannelName *cn );

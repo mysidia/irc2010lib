@@ -37,7 +37,7 @@ void Ircdns_init();
 struct _dnscallent;
 struct _dnsquery;
 
-typedef int DnsCallBack (struct _dnsquery*, char *result, void *data);
+typedef int DnsCallBack (struct _dnsquery*, char *result, void *answer, void* data);
 
 /**
  * An internal DNS callback entry

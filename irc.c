@@ -31,7 +31,7 @@
 #include "irclib.h"
 #include "dns.h"
 
-ID("$Id: irc.c,v 1.15 2004/03/28 07:59:14 mysidia Exp $");
+ID("$Id: irc.c,v 1.16 2004/03/28 09:58:52 mysidia Exp $");
 time_t CTime;
 
 /**
@@ -132,3 +132,30 @@ void IrcMakeMessage(IrcMessage* mb, char *buf)
 	mb->numarg = i;
 }
 
+int IrcMessageText(IrcMessage* m, char* buf, int len, int start, int end)
+{
+	int i, j, k = 0;
+
+	if (end == -1)
+		end = m->numarg - 1;
+
+	if (end >= m->numarg)
+		end = m->numarg - 1;
+
+	for(i = start; i <= end ; i++) {
+		for(j = 0; m->args[i][j]; j++) {
+			buf[k++] = m->args[i][j];
+			if (k+1 >= len) {
+				buf[k++] = '\0';
+				return -1;
+			}
+		}
+		if (k+1 >= len && (i+1) < end) {
+			buf[k++] = '\0';
+			return -1;
+		}
+		buf[k++] = ' ';
+	}
+	buf[k++] = '\0';
+	return 0;
+}

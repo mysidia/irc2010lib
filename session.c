@@ -34,12 +34,12 @@
 #include "irclib.h"
 #include "channel.h"
 
-ID("$Id: session.c,v 1.2 2004/03/28 07:59:14 mysidia Exp $");
+ID("$Id: session.c,v 1.3 2004/03/28 09:58:52 mysidia Exp $");
 
 /**
  * Create a session
  */
-IrcSession* irc_session_make()
+IrcSession* Irc_session_make()
 {
 	IrcSession* ses = (IrcSession *)oalloc(sizeof(IrcSession));
 
@@ -48,3 +48,27 @@ IrcSession* irc_session_make()
 	ses->chanHash = ilNewHashTable(DEFCHANHASHSIZE, IrcChanVoidPtrHashableName);
 	ses->sock = NULL;
 }
+
+void
+Ircsess_setinfo(IrcSession* ses, const char* nick, const char* user, const char* host,
+	const char* real)
+{
+	ses->userData.namp = strdup(nick);
+	ses->userData.userp = strdup(user);
+	ses->userData.hostp = strdup(host);
+	ses->userData.realp = strdup(real);
+}
+
+int
+Ircsess_register(IrcSession* ses)
+{
+	if (ses->sock->fd < 0)
+		return -1;
+
+	IrcSend(ses->sock, "NICK %s\r\n", ses->userData.namp);
+	IrcSend(ses->sock, "USER %s %s %s :%s\r\n", ses->userData.userp, 
+			ses->userData.hostp, 
+			ses->userData.servp ? ses->userData.servp : "Unknown", 
+			ses->userData.realp);
+}
+					

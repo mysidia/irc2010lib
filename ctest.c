@@ -20,7 +20,7 @@
 #include "irclib.h"
 #include "dns.h"
 #include <assert.h>
-ID("$Id: ctest.c,v 1.4 2004/03/28 07:59:14 mysidia Exp $");
+ID("$Id: ctest.c,v 1.5 2004/03/28 09:58:52 mysidia Exp $");
 
 int Test(IrcSocket *cl)
 {
@@ -38,7 +38,7 @@ int Test(IrcSocket *cl)
 	lasttime = time(NULL);
 }
 
-int funFin (IrcDnsQuery *q, char *r, void *d )
+int funFin (IrcDnsQuery *q, char *r, void *d, void* x)
 {
 	if (d)
 		printf("DNS: %s -> %s\n", q->ip, r);

@@ -51,7 +51,7 @@ CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
 
-# $Id: Makefile.in,v 1.25 2004/03/28 07:39:48 mysidia Exp $
+# $Id: Makefile.in,v 1.26 2004/03/28 09:58:49 mysidia Exp $
 #
 #
 DEFS = -D_IRCLIB_INTERNAL @DEFS@
@@ -123,12 +123,15 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 
-bin_PROGRAMS = stest ctest sockmon
-stest_SOURCES = stest.c
+bin_PROGRAMS = stest ctest sockmon irctest
+stest_SOURCES = stest.c 
 stest_LDADD = libirc.la -levent -ladns
 
 ctest_SOURCES = ctest.c
 ctest_LDADD = libirc.la -levent -ladns
+
+irctest_SOURCES = irctest.c
+irctest_LDADD = libirc.la -levent -ladns
 
 sockmon_SOURCES = sockmon.c
 sockmon_LDADD = libirc.la -levent -ladns
@@ -151,13 +154,18 @@ libirc_la_LIBADD =
 am_libirc_la_OBJECTS = match.lo mem.lo sock.lo server.lo irc.lo \
 	channel.lo dns.lo hash.lo proto.lo user.lo session.lo
 libirc_la_OBJECTS = $(am_libirc_la_OBJECTS)
-bin_PROGRAMS = stest$(EXEEXT) ctest$(EXEEXT) sockmon$(EXEEXT)
+bin_PROGRAMS = stest$(EXEEXT) ctest$(EXEEXT) sockmon$(EXEEXT) \
+	irctest$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
 
 am_ctest_OBJECTS = ctest.$(OBJEXT)
 ctest_OBJECTS = $(am_ctest_OBJECTS)
 ctest_DEPENDENCIES = libirc.la
 ctest_LDFLAGS =
+am_irctest_OBJECTS = irctest.$(OBJEXT)
+irctest_OBJECTS = $(am_irctest_OBJECTS)
+irctest_DEPENDENCIES = libirc.la
+irctest_LDFLAGS =
 am_sockmon_OBJECTS = sockmon.$(OBJEXT)
 sockmon_OBJECTS = $(am_sockmon_OBJECTS)
 sockmon_DEPENDENCIES = libirc.la
@@ -172,11 +180,12 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/channel.Plo ./$(DEPDIR)/ctest.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/dns.Plo ./$(DEPDIR)/hash.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/irc.Plo ./$(DEPDIR)/match.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/mem.Plo ./$(DEPDIR)/proto.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/server.Plo ./$(DEPDIR)/session.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/sock.Plo ./$(DEPDIR)/sockmon.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/stest.Po ./$(DEPDIR)/user.Plo
+@AMDEP_TRUE@	./$(DEPDIR)/irc.Plo ./$(DEPDIR)/irctest.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/match.Plo ./$(DEPDIR)/mem.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/proto.Plo ./$(DEPDIR)/server.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/session.Plo ./$(DEPDIR)/sock.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/sockmon.Po ./$(DEPDIR)/stest.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/user.Plo
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -184,15 +193,15 @@ LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-DIST_SOURCES = $(libirc_la_SOURCES) $(ctest_SOURCES) $(sockmon_SOURCES) \
-	$(stest_SOURCES)
+DIST_SOURCES = $(libirc_la_SOURCES) $(ctest_SOURCES) $(irctest_SOURCES) \
+	$(sockmon_SOURCES) $(stest_SOURCES)
 HEADERS = $(include_HEADERS)
 
 DIST_COMMON = README $(include_HEADERS) AUTHORS COPYING ChangeLog \
 	INSTALL Makefile.am Makefile.in NEWS THANKS aclocal.m4 \
 	config.guess config.sub configure configure.in depcomp \
 	install-sh ltmain.sh missing mkinstalldirs
-SOURCES = $(libirc_la_SOURCES) $(ctest_SOURCES) $(sockmon_SOURCES) $(stest_SOURCES)
+SOURCES = $(libirc_la_SOURCES) $(ctest_SOURCES) $(irctest_SOURCES) $(sockmon_SOURCES) $(stest_SOURCES)
 
 all: all-am
 
@@ -276,6 +285,9 @@ clean-binPROGRAMS:
 ctest$(EXEEXT): $(ctest_OBJECTS) $(ctest_DEPENDENCIES) 
 	@rm -f ctest$(EXEEXT)
 	$(LINK) $(ctest_LDFLAGS) $(ctest_OBJECTS) $(ctest_LDADD) $(LIBS)
+irctest$(EXEEXT): $(irctest_OBJECTS) $(irctest_DEPENDENCIES) 
+	@rm -f irctest$(EXEEXT)
+	$(LINK) $(irctest_LDFLAGS) $(irctest_OBJECTS) $(irctest_LDADD) $(LIBS)
 sockmon$(EXEEXT): $(sockmon_OBJECTS) $(sockmon_DEPENDENCIES) 
 	@rm -f sockmon$(EXEEXT)
 	$(LINK) $(sockmon_LDFLAGS) $(sockmon_OBJECTS) $(sockmon_LDADD) $(LIBS)
@@ -294,6 +306,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dns.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hash.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/irc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/irctest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/match.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/proto.Plo@am__quote@

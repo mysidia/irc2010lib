@@ -58,7 +58,7 @@ struct _channame
 };
 typedef struct _channame IrcChannelName;
 
-struct _chanhandle
+struct _irc_chanhandle
 {
 	LIST_HEAD(,_chanuser)	*users;
 	IrcChannelName	*channelName;
@@ -66,7 +66,7 @@ struct _chanhandle
 	time_t			lastTime;
 	IrcChannelMode		mode;
 };
-typedef struct _chanhandle IrcChannel;
+typedef struct _irc_chanhandle IrcChannel;
 
 struct _chanuser
 {

@@ -31,7 +31,7 @@
 #include "irclib.h"
 #include <stddef.h>
 
-ID("$Id: sock.c,v 1.34 2004/03/28 07:59:14 mysidia Exp $");
+ID("$Id: sock.c,v 1.35 2004/03/28 09:58:52 mysidia Exp $");
 
 void IrcLibEventSocket(int fd, short evType, void *p);
 void IrcLibEventListener(int fd, short evType, void *p);
@@ -229,7 +229,7 @@ int
 IrcLibReadPackets(IrcSocket *ptrLink)
 {
 	char sockbuf[8192], *b;
-	int k, kt = 0;
+	int k, kt = 0, msgl;
 
 	if (ptrLink->tailBuf != NULL) {
 		b = sockbuf;
@@ -247,7 +247,7 @@ IrcLibReadPackets(IrcSocket *ptrLink)
 	while(k > 0)
 	{
 		kt += k;
-		b = IrcBufShove(&ptrLink->inBuf, sockbuf, k);
+		b = IrcBufShove(&ptrLink->inBuf, sockbuf, k, &msgl);
 
 		tailbuf:
 
@@ -258,12 +258,12 @@ IrcLibReadPackets(IrcSocket *ptrLink)
 				strcpy(sockbuf, b);
 			len = strlen(b);
 
-			if (len >= SOCKBUFSIZE)
+			if (len >= SOCKBUFSIZE || msgl >= 8000)
 				return -1;
 
-			k = read(ptrLink->fd, sockbuf + len, sizeof(sockbuf) - len);
+			k = read(ptrLink->fd, sockbuf + msgl, sizeof(sockbuf) - msgl);
 			if (k > 0) {
-				k += len;
+				k += msgl;
 				b = NULL;
 			}
 		}
@@ -297,6 +297,7 @@ IrcLibReadBinary(IrcSocket *ptrLink)
 {
 	char sockbuf[8192], *b;
 	int k, kt = 0;
+	size_t msgl;
 
 	if (ptrLink->tailBuf != NULL) {
 		b = sockbuf;
@@ -311,7 +312,7 @@ IrcLibReadBinary(IrcSocket *ptrLink)
 	while(k > 0)
 	{
 		kt += k;
-		IrcBufShoveBinary(&ptrLink->inBuf, sockbuf, k);
+		IrcBufShoveBinary(&ptrLink->inBuf, sockbuf, k, &msgl);
 		k = read(ptrLink->fd, sockbuf, sizeof(sockbuf));
 	}
 
@@ -422,6 +423,7 @@ IrcSend(IrcSocket *s, const char *fmt, ...)
 {
 	static char buf[IRCBUFSIZE+3];
 	va_list ap;
+	size_t p;
 
 
 	va_start(ap, fmt);
@@ -430,7 +432,7 @@ IrcSend(IrcSocket *s, const char *fmt, ...)
 
 	strcat(buf, "\r\n");
 
-	IrcBufShove(&s->outBuf, buf, strlen(buf));
+	IrcBufShove(&s->outBuf, buf, strlen(buf), &p);
 }
 
 /**
@@ -552,14 +554,14 @@ typedef struct _ircbq BufQel;
  *        before a \\n onto the buffer.
  */
 static char *
-qPush(IrcBuf *t, char *text, char *sep)
+qPush(IrcBuf *t, char *text, char *sep, size_t *rlen)
 {
 	BufQel *z;
 
 	z = (BufQel *)oalloc(sizeof(BufQel) + (sep - text + 1));
 
 	*sep = '\0';
-	z->len = sep - text;
+	*rlen = z->len = sep - text;
 	z->text = (char *)oalloc(z->len + 1);
 	strcpy(z->text, text);
 
@@ -596,18 +598,18 @@ qPush(IrcBuf *t, char *text, char *sep)
  */
 
 char *
-IrcBufShove(IrcBuf *t, char *textIn, size_t textLen)
+IrcBufShove(IrcBuf *t, char *textIn, size_t textLen, size_t* rlen)
 {
 	char *p;
 	char *text = textIn;
 
 	for(p = text; p < (textIn + textLen); p++) {
 		if (*p == '\n' || (*p == '\r' && p[1] == '\n')) {
-			text = qPush(t, text, p);
+			text = qPush(t, text, p, rlen);
 
-			while((p<(textIn+textLen)) && (*p=='\r'||*p=='\n')) {
+			while((p<(textIn+textLen)) && *p && (p[1]=='\r'||p[1]=='\n')) {
 				p++;
-				text++;
+				text++; 
 			}
 		}
 	}
