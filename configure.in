@@ -35,7 +35,12 @@ dnl Checks for libraries.
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(fcntl.h limits.h malloc.h strings.h sys/ioctl.h sys/types.h sys/socket.h sys/time.h sys/queue.h syslog.h queue.h unistd.h)
+AC_CHECK_HEADERS(fcntl.h limits.h malloc.h strings.h sys/ioctl.h sys/types.h sys/socket.h sys/time.h sys/queue.h syslog.h queue.h unistd.h values.h)
+AC_CHECK_HEADER(event.h, AC_DEFINE(HAVE_EVENT_H), AC_MSG_ERROR([This library requires libevent. See INSTALL for more information.]))
+AC_CHECK_HEADER(adns.h, AC_DEFINE(HAVE_ADNS_H), AC_MSG_ERROR([This library requires adns. See INSTALL for more information.]))
+AC_CHECK_LIB(adns, adns_submit,, AC_MSG_ERROR([This library requires adns. See INSTALL for more information.]))
+AC_CHECK_LIB(event, event_init,, AC_MSG_ERROR([This library requires libevent. See INSTALL for more information.]))
+
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST

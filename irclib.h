@@ -31,8 +31,6 @@
  * @brief Library Header
  */
 
-#if 1
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -70,6 +68,7 @@
 #include <limits.h>
 #endif
 
+#ifdef HAVE_VALUES_H
 #include <values.h>
 
 #ifdef HAVE_SYS_TIME_H
@@ -98,7 +97,10 @@
 #include <arpa/inet.h>
 #endif
 
+#ifdef HAVE_EVENT_H
 #include <event.h>
+#endif
+
 #include <stdarg.h>
 
 int match(const char*, const char*);
@@ -211,19 +213,23 @@ extern time_t CTime;
 #define IrcListener	IRC(Listener)
 #define IrcSocket	IRC(Socket)
 
+#ifndef __IDSTRING
 
 #define __IDSTRING(name, string) \
 	static const char name[] = string
+
+#endif
+
 //	static const char name[] __attribute__((__unused__)) = (string)
 
 #ifndef __RCSID
-#ifdef _DOXYGEN
-#define ID(x) __RCSID(x);
-#else
-#define ID(x) \
-	__RCSID(x); \
-	static void use_rcsid() { rcsid; }
-#endif
-#define __RCSID(s) __IDSTRING(rcsid, s)	
-#define __USEVAR(s) __IDSTRING(s, "(null)")
+#	ifdef _DOXYGEN
+#		define ID(x) __RCSID(x);
+#	else
+#		define ID(x) \
+		__RCSID(x); \
+		static void use_rcsid() { rcsid; }
+#	endif
+#	define __RCSID(s) __IDSTRING(rcsid, s)	
+#	define __USEVAR(s) __IDSTRING(s, "(null)")
 #endif
