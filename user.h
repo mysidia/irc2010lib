@@ -1,6 +1,6 @@
 /*
- *  Channel Header
- *  Copyright C 2001 ***REMOVED***.  All Rights Reserved.
+ *  User Information Header
+ *  Copyright C 2004 ***REMOVED***.  All Rights Reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,48 +25,36 @@
  */
 
 /**
- * @file channel.h
- * @brief Channel Header
+ * @file user.h
+ * @brief User Info Header
  */
 
-#include "user.h"
-
-#define IEOL "\r\n"
-
+#ifndef __nick_h_include__
+#define __nick_h_include__
 struct _irc_hash_table;
 
-struct _chan_mode_par {
-	char fl;
+struct _user_mode_par {
+	int fl;
 	char *value;
 };
-typedef struct _chan_mode_par IrcChannelModePar;
+typedef struct _user_mode_par IrcUserModePar;
 
-struct _chanmode
+struct _chanhandle;
+
+struct _nickname
 {
-	IrcChannelModePar	*modeparams;
-	long mode[2];
-
-	char paramCount;
+	char	*namp;
 };
-typedef struct _chanmode IrcChannelMode;
-typedef struct _chanmode IRC(ChannelMode);
+typedef struct _channame IRC(NickName);
 
-
-struct _channame
+struct _userhandle
 {
-	char	*name;
+	LIST_HEAD(,_chanhandle)	*channels;
+	IRC(NickName)		nick;
+	time_t			login;
+	long			modes[2];
 };
-typedef struct _channame IRC(ChannelName);
-
-struct _chanhandle
-{
-	LIST_HEAD(,_chanuser)	*users;
-	IRC(ChannelName)	*channelName;
-	time_t			created;
-	time_t			lastTime;
-	IrcChannelMode		mode;
-};
-typedef struct _chanhandle IrcChannel;
+typedef struct _chanhandle IrcUser;
 
 struct _chanuser
 {
@@ -74,7 +62,7 @@ struct _chanuser
 //	IRC(NickName)		nick;
 };
 
-void IrcAddChannel ( struct _irc_hash_table**, IrcChannel *cl );
+/*void IrcAddChannel ( struct _irc_hash_table**, IrcChannel *cl );
 IrcChannel *IrcFindChannel ( struct _irc_hash_table**, IRC(ChannelName) *cn );
-void IrcDelChannel ( struct _irc_hash_table**, IrcChannel *cl );
-
+void IrcDelChannel ( struct _irc_hash_table**, IrcChannel *cl );*/
+#endif
