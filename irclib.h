@@ -139,6 +139,8 @@ struct _ircsocket
 	char __outbuf__[sizeof(IrcLibSocketBuf)];
 #endif
 
+	time_t lasttime;
+	struct _irclistener *port;
 	int (* func)(struct _ircsocket*, char *);
 	int (* periodic)(struct _ircsocket*);
 
@@ -147,13 +149,13 @@ struct _ircsocket
 
 typedef struct _ircsocket IrcSocket;
 
-typedef struct
+struct _irclistener
 {
 	int topFd;
 
 	IrcSocket *sock;
 	LIST_HEAD(, _ircsocket)	links;
-} IrcListener;
+}; typedef struct _irclistener IrcListener;
 
 
 struct _irccon
@@ -182,5 +184,6 @@ void IrcSend(IrcSocket *, const char *, ...);
 int IrcLibDefaultSockHandler(IrcSocket *, char *);
 int IrcLibDefaultListenHandler(IrcSocket *, char *);
 int IrcLibDefaultClientHandler(IrcSocket *, char *);
+extern time_t CTime;
 
 #define IrcLibPop IrcLib_pop

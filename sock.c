@@ -141,6 +141,7 @@ IrcListener *LibIrcMakeListener(IrcSocket *theSocket)
 	port->sock = theSocket;
 	port->sock->func = IrcLibDefaultListenHandler;
 	port->sock->periodic = NULL;
+	port->sock->port = port;
 
 	port->topFd = theSocket->fd;
 	LIST_INIT(&port->links);
@@ -165,14 +166,10 @@ void LibIrcSocketAddEvents(IrcSocket *theSocket)
 	if ((theSocket->flags & IRCSOCK_WRITE) == 0)
 		event_set(p, theSocket->fd, EV_READ | EV_WRITE | EV_TIMEOUT, IrcLibEventSocket, theSocket);
 
-	if (theSocket->outBuf.firstEls) {
-		theSocket->tv.tv_usec = 10000;
-		theSocket->tv.tv_sec = 0;
+	theSocket->tv.tv_usec = 10000;
+	theSocket->tv.tv_sec = 0;
 
-		event_add(p, &theSocket->tv);
-	}
-	else
-		event_add(p, NULL);
+	event_add(p, &theSocket->tv);
 
 	theSocket->theEvent = p;
 }
@@ -188,8 +185,11 @@ void LibIrcListenerAddEvents(IrcListener *thePort)
 		event_del(p);
 	}
 
-	event_set(p, thePort->sock->fd, EV_READ, IrcLibEventListener, thePort);
-	event_add(p, NULL);
+	thePort->sock->tv.tv_sec = 1;
+	thePort->sock->tv.tv_usec = 0;
+
+	event_set(p, thePort->sock->fd, EV_READ | EV_TIMEOUT, IrcLibEventListener, thePort);
+	event_add(p, &thePort->sock->tv);
 	thePort->sock->theEvent = p;
 }
 
@@ -251,6 +251,16 @@ IrcLibEventListener(int fd, short evType, void *vI)
 	struct sockaddr_in sai;
 	int pFd, alen, ipOk;
 
+	CTime = time(NULL);
+
+	if (evType & EV_TIMEOUT)
+		if (li->sock->periodic) {
+			if ( (* li->sock->periodic)(li->sock) < 0) {
+				return;
+			}
+		}
+
+	if (evType & EV_READ)
 	if ((pFd = accept(li->sock->fd, (struct sockaddr *)&sai, &alen)) != -1)
 	{
 		ipOk = 1;
@@ -266,6 +276,7 @@ IrcLibEventListener(int fd, short evType, void *vI)
 			IrcLibAddCon(li, p);
 			p->fd = pFd;
 			p->addr = sai.sin_addr;
+			p->port = li;
 			(* li->sock->func)(p, "");
 //XXX debug
 			printf("Incoming link from %x\n", sai.sin_addr.s_addr);
@@ -304,10 +315,13 @@ IrcLibEventSocket(int fd, short evType, void *p)
 	char buf[SOCKBUFSIZE];
 	int l;
 
+	CTime = time(NULL);
+
 	if (evType & EV_WRITE)
 		q->flags |= IRCSOCK_WRITE;
 
-	if ((evType & EV_READ) != 0) {
+	if ((evType & EV_READ) != 0) 
+	{
 		if (IrcLibReadPackets(q) < 0)
 		{
 	//XXX debug
@@ -317,7 +331,7 @@ IrcLibEventSocket(int fd, short evType, void *p)
 			IrcFreeSocket(q);
 			return;
 		}
-	
+
 		while (IrcLib_pop(&q->inBuf, buf, 0)) {
 			if ( (* q->func)(q, buf) < 0 ) {
 				close(q->fd);
@@ -325,12 +339,14 @@ IrcLibEventSocket(int fd, short evType, void *p)
 				IrcFreeSocket(q);
 				return;
 			}
-		}
+		}	
 	}
 
-	if (evType & EV_TIMEOUT) 
+	if ((evType & EV_TIMEOUT) || (evType & EV_READ)) 
 	{
-		if (q->periodic) {
+		if (q->periodic && ((CTime - q->lasttime) > 0)) {
+			q->lasttime = CTime;
+
 			if ( (* q->periodic)(q) < 0) {
 				close(q->fd);
 				IrcLibdelCon(q);
@@ -340,6 +356,7 @@ IrcLibEventSocket(int fd, short evType, void *p)
 		}
 
 		while (IrcLib_pop(&q->outBuf, buf, 1)) {
+printf("---\n");
 			if ( send(q->fd, buf, strlen(buf), 0) < 0 ) {
 				q->flags &= ~IRCSOCK_WRITE;
 

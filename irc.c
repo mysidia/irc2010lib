@@ -26,6 +26,8 @@
 #include "irclib.h"
 #include <event.h>
 
+time_t CTime;
+
 void LibIrcInit()
 {
 	event_init();
@@ -34,6 +36,8 @@ void LibIrcInit()
 
 int LibIrcSystemLoop()
 {
+	CTime = time(NULL);
+
 	if ( event_dispatch() < 0 )
 		abort();
 }
