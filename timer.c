@@ -43,9 +43,15 @@ typedef int timerCallBackSocket (IrcSocket*, void *pData);
 */
 
 
+/**
+ * The list of timers
+ */
 static LIST_HEAD(,ircTimer)	globalTimerList;
 
 
+/**
+ * The default interval getter
+ */
 static void ircDefaultGetInterval(struct timeval* tv)
 {
 	if ( gettimeofday(tv, NULL) == -1 ) {
@@ -54,6 +60,9 @@ static void ircDefaultGetInterval(struct timeval* tv)
 	}
 }
 
+/**
+ * Create a new timer with defaults
+ */
 ircTimer* ircMakeTimer (timerCallBack* cb, struct timeval* tv) {
 	ircTimer* t = oalloc(sizeof(ircTimer));
 
@@ -66,11 +75,13 @@ ircTimer* ircMakeTimer (timerCallBack* cb, struct timeval* tv) {
 	return t;
 }
 
+/**
+ * Free the timer structure
+ */
 void ircFreeTimer (ircTimer* z) {
 	free (z);
 	return;
 }
-
 
 ircTimer* ircTimerScheduleSession(
         struct IrcLibSession* ses,
