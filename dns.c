@@ -30,7 +30,7 @@
 
 #include "irclib.h"
 #include "dns.h"
-ID("$Id: dns.c,v 1.6 2001/10/25 04:54:28 mysidia Exp $");
+ID("$Id: dns.c,v 1.7 2001/10/25 04:57:54 mysidia Exp $");
 
 static adns_state dns_state;
 static LIST_HEAD(, _dnsquery) queries;
@@ -174,33 +174,39 @@ void check_dns()
 				free(call);
 			}
 		}
-
-		/* ip -> host */
-		if (req->rev) {
-			sprintf(host, "%.100s", ans->rrs.str[0]);
-			sprintf(ip, "%.100s", req->ip);
-		}
-		else {
-			sprintf(ip, "%.100s", inet_ntoa(ans->rrs.addr->addr.inet.sin_addr));
-			sprintf(host, "%.100s", req->ip);
-		}
-
-
-		/* DNS Succeeded */
-		for(call = req->calls.lh_first; call; call = call_next)
+		else
 		{
-			call_next = call->call_lst.le_next;
 
-			if (req->rev)
-				(* call->func)(req, host, ans);
-			else
-				(* call->func)(req, ip, ans);
+			/* ip -> host */
+			if (req->rev) {
+				if (ans)
+					sprintf(host, "%.100s", ans->rrs.str[0]);
+				else
+					host[0] = '\0';
+				sprintf(ip, "%.100s", req->ip);
+			}
+			else {
+				sprintf(ip, "%.100s", inet_ntoa(ans->rrs.addr->addr.inet.sin_addr));
+				sprintf(host, "%.100s", req->ip);
+			}
 
-			LIST_REMOVE(call, call_lst);
-			free(call);
+	
+			/* DNS Succeeded */
+			for(call = req->calls.lh_first; call; call = call_next)
+			{
+				call_next = call->call_lst.le_next;
+	
+				if (req->rev)
+					(* call->func)(req, host, ans);
+				else
+					(* call->func)(req, ip, ans);
+	
+				LIST_REMOVE(call, call_lst);
+				free(call);
+			}
+			if (req->ip)
+				free(req->ip);
+			free(req);
 		}
-		if (req->ip)
-			free(req->ip);
-		free(req);
 	}
 }
