@@ -189,6 +189,7 @@ int IrcLibDefaultListenHandler(IRC(Socket) *, char *);
 int IrcLibDefaultClientHandler(IRC(Socket) *, char *);
 extern time_t CTime;
 
+int IRC(match)(const char *mask, const char *string);
 
 #define IrcLibPop	IrcLib_pop
 #define IrcListener	IRC(Listener)

@@ -1,0 +1,9 @@
+Not a lot yet, at the moment only basic sockets are supported.
+
+Only server-side sockets at the moment, DNS is the next item
+
+then client-side sockets.
+
+Then more complicated things like message parsing inbound/outbound,
+
+flood/idle protects, more advanced features, etc

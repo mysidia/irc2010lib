@@ -24,8 +24,9 @@
  *
  */
 
-#define HOSTLEN 63
-#define NULL (void *)0
+#include "irclib.h"
+
+
 /**
  *  \fn int match(const char *mask, const char *string)
  *  \param mask Pattern to match against
@@ -54,7 +55,7 @@
  */
 
 int
-match(const char *mask, const char *string)
+IRC(match)(const char *mask, const char *string)
 {
         const char  *m = mask,
                 *n = string,
