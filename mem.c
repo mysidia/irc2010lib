@@ -47,6 +47,11 @@ oalloc(size_t iMemLen)
 
 void IrcFreeSocket(IrcSocket *q)
 {
+	if (q->theEvent) {
+		event_del(q->theEvent);
+		free(q->theEvent);
+	}
+
 	free(q);
 }
 
