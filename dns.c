@@ -30,13 +30,13 @@
 
 #include "irclib.h"
 #include "dns.h"
-ID("$Id: dns.c,v 1.7 2001/10/25 04:57:54 mysidia Exp $");
+ID("$Id: dns.c,v 1.8 2001/10/25 04:59:01 mysidia Exp $");
 
 static adns_state dns_state;
 static LIST_HEAD(, _dnsquery) queries;
 
-void IrcLibEventDNSProcess(int fd, short evType, void *pData);
-void check_dns();
+static void IrcLibEventDNSProcess(int fd, short evType, void *pData);
+static void check_dns();
 
 void IRC(dns_init)()
 {
@@ -51,7 +51,7 @@ void IRC(dns_init)()
 	IrcLibEventDNSProcess(0, 0, &dns_state);
 }
 
-void IrcLibEventDNSProcess(int fd, short evType, void *pData)
+static void IrcLibEventDNSProcess(int fd, short evType, void *pData)
 {
 	static struct event ev;
 	static struct timeval tv;
@@ -66,7 +66,7 @@ void IrcLibEventDNSProcess(int fd, short evType, void *pData)
 	check_dns();
 }
 
-char *ip2ptr(char *host)
+static char *ip2ptr(char *host)
 {
    static char buf[HOSTLEN + 25];
    unsigned short int a, b, c, d;
@@ -133,7 +133,7 @@ int query_dns(int reverse, char *host, DnsCallBack *func, void *data)
 	return 0;
 }
 
-void check_dns()
+static void check_dns()
 {
 	char ip[256];
 	char host[256];

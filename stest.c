@@ -1,7 +1,7 @@
 #include "irclib.h"
 #include "dns.h"
 #include <assert.h>
-ID("$Id: stest.c,v 1.8 2001/10/25 04:54:28 mysidia Exp $");
+ID("$Id: stest.c,v 1.9 2001/10/25 05:01:03 mysidia Exp $");
 
 int Test(IrcSocket *cl)
 {
@@ -53,7 +53,7 @@ int main()
 
 	q->sock->periodic = Test;
 
-	query_dns(1, "1.2.3.4", funFin, NULL);	
+	query_dns(0, "localhost", funFin, NULL);	
 	IRC(SystemLoop)();
 
 //	sleep (6000);
