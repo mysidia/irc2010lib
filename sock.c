@@ -59,20 +59,20 @@ int doNonBlock(int listenDesc)
 	return 0;
 }
 
-Socket *make_socket()
+IrcSocket *LibIrc_socket_make()
 {
-	Socket *sockLink;
+	IrcSocket *sockLink;
 	int fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 	if (fd == -1)
 		return NULL;
-	sockLink = oalloc(sizeof(Socket));
+	sockLink = oalloc(sizeof(IrcSocket));
 
 	sockLink->fd = fd;
 	return;
 }
 
-int socket_bind(Socket *theSocket, int portNum)
+int LibIrc_socket_bind(IrcSocket *theSocket, int portNum)
 {
 	struct sockaddr_in sa;
 	int reuseAddr;
@@ -94,16 +94,16 @@ int socket_bind(Socket *theSocket, int portNum)
 	return 0;
 }
 
-Listener *socket_listen(Socket *theSocket)
+IrcListener *LibIrc_socket_listen(IrcSocket *theSocket)
 {
-	Listener *port;
+	IrcListener *port;
 
 	if ( listen(theSocket->fd, 5) < 0 ) {
 		perror("listen");
 		return NULL;
 	}
 
-	port = oalloc(sizeof(Listener));
+	port = oalloc(sizeof(IrcListener));
 
 	port->sock = theSocket;
 	port->topFd = theSocket->fd;
@@ -111,7 +111,7 @@ Listener *socket_listen(Socket *theSocket)
 	return port;
 }
 
-void socket_addevents(Socket *theSocket)
+void LibIrc_socket_addevents(IrcSocket *theSocket)
 {
 	struct event *p = oalloc(sizeof(struct event));
 
@@ -127,7 +127,7 @@ void socket_addevents(Socket *theSocket)
  *          0 on no data yet or data read
  */
 int
-IrcLibReadPackets(Socket *ptrLink)
+IrcLibReadPackets(IrcSocket *ptrLink)
 {
 	char sockbuf[8192], *b;
 	int k, kt = 0;
@@ -167,9 +167,9 @@ IrcLibReadPackets(Socket *ptrLink)
 }
 
 
-void irclibEventListener(Listener *li)
+void irclibEventListener(IrcListener *li)
 {
-	Socket *p;
+	IrcSocket *p;
 	struct sockaddr_in sai;
 	int pFd, alen, ipOk;
 
@@ -184,7 +184,7 @@ void irclibEventListener(Listener *li)
 		{
 			if (pFd > li->topFd)
 				li->topFd = pFd;
-			p = (Socket *)oalloc(sizeof(Socket));
+			p = (IrcSocket *)oalloc(sizeof(IrcSocket));
 			IrcLibaddCon(li, p);
 			p->fd = pFd;
 			p->addr = sai.sin_addr;
@@ -197,7 +197,7 @@ void irclibEventListener(Listener *li)
 
 void irclibEventSocket(int fd, short evType, void *p)
 {
-	Socket *q = (Socket *)p;
+	IrcSocket *q = (IrcSocket *)p;
 
 	char buf[SOCKBUFSIZE];
 

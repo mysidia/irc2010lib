@@ -37,13 +37,13 @@ typedef struct
 	struct in_addr addr;
 
 	IrcLibSocketBuf buf;
-} Socket;
+} IrcSocket;
 
 typedef struct
 {
 	int topFd;
 
-	Socket *sock;
-	Socket *links;
-} Listener;
+	IrcSocket *sock;
+	IrcSocket *links;
+} IrcListener;
 
