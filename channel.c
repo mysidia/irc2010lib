@@ -64,7 +64,7 @@ IrcChannelMode IrcLibFlagToMode(char flag)
 {
 	IrcChannelMode mode;
 
-	if (isalpha(flag)) 
+	if (flag != '-' && flag != '+') 
 	{
 		int i = 0; 
 
