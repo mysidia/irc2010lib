@@ -18,7 +18,7 @@
 #include "irclib.h"
 #include "dns.h"
 #include <assert.h>
-ID("$Id: sockmon.c,v 1.3 2004/03/28 07:59:14 mysidia Exp $");
+ID("$Id: sockmon.c,v 1.4 2004/08/30 04:20:58 mysidia Exp $");
 
 IrcSocket *testCli;
 
@@ -103,3 +103,5 @@ int main()
 
 //	sleep (6000);
 }
+
+/*************************************************************************/

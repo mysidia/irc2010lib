@@ -238,6 +238,8 @@ void ircUpdateTimers(int n)
 
 void deleteGlobalTimers ()
 {
+	 // while (timer exists)  remove timer ...
+	// while(LIST_FIRST(globalTimers))  { LIST_REMOVE; ircFreeTimer }
 // Not done
 }
 
