@@ -85,6 +85,10 @@ void IRC(ChanPart) (IRC(Ses)so, IRC(ChannelName) *chan_name)
 	IrcSend(so.sock, "PART %s" IEOL, IRC(ChanCgetName)(chan_name));
 }
 
+//void IRC(ChanAddUser) ( )
+//{
+//}
+
 void IRC(SendModeChange) (
 			  IRC(Ses) so, 
 			  IRC(ChannelName) *chan_name,

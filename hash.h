@@ -1,4 +1,4 @@
-/* $Id: hash.h,v 1.9 2002/02/26 01:04:24 mysidia Exp $ */
+/* $Id: hash.h,v 1.10 2002/07/14 00:25:24 mysidia Exp $ */
 
 /*
  *  Hash Table Header
@@ -29,6 +29,9 @@
  * @file hash.h
  * @brief Hash Table header 
  */
+
+#ifndef __hash_h__
+#define __hash_h__
 
 #include <stddef.h>
 
@@ -69,3 +72,4 @@ ilHashTable *ilFreeHashTable(ilHashTable *);
 
 int ilHashDel(ilHashTable*, void *);
 
+#endif

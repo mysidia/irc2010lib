@@ -95,6 +95,7 @@
 #endif*/
 
 #include "queue.h"
+#include "hash.h"
 
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -279,6 +280,7 @@ extern time_t CTime;
 struct IRC(_session)
 {
 	IRC(Socket) *sock;
+	ilHashTable **chanHash;
 };
 typedef struct IRC(_session) IRC(Ses);
 typedef struct IRC(_session) IRC(Session);
