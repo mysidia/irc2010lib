@@ -18,7 +18,7 @@
 #include "irclib.h"
 #include "dns.h"
 #include <assert.h>
-ID("$Id: stest.c,v 1.13 2001/12/16 10:01:44 mysidia Exp $");
+ID("$Id: stest.c,v 1.14 2001/12/29 22:25:51 mysidia Exp $");
 
 IRC(Socket) *testCli;
 
@@ -82,7 +82,7 @@ int main()
 
 	addr.s_addr = inet_addr("127.0.0.1");
 
-	query_dns(0, "localhost", funFin, NULL); /* test DNS */
+	query_dns(0, "rs.internic.net", funFin, NULL); /* test DNS */
 
 	IRC(SystemLoop)();
 

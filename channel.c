@@ -30,7 +30,7 @@
 
 #include "irclib.h"
 #include "channel.h"
-
+#include "hash.h"
 
 /**********************************************************************/
 
@@ -203,3 +203,18 @@ void IrcLibModeSetMode(IrcChannelMode *q, const char *flagsToSet,
 		flagsToSet++;
 	}
 }
+
+/********************************************************************/
+
+void IrcAddChannelHash ( IrcChannel *cl )
+{
+}
+
+IrcChannel *IrcFindChannelHash ( IRC(ChannelName) *cn )
+{
+}
+
+void IrcDelChannelHash ( IrcChannel *cl )
+{
+}
+

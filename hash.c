@@ -47,3 +47,4 @@ IRCHashKey(char *datum)
 
 	return 0;
 }
+
