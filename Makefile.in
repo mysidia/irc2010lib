@@ -10,7 +10,7 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
-# $Id: Makefile.in,v 1.9 2001/10/27 18:57:06 mysidia Exp $
+# $Id: Makefile.in,v 1.10 2001/10/27 19:01:53 mysidia Exp $
 #
 #
 
@@ -84,6 +84,8 @@ stest_LDADD = libirc.la -levent -ladns
 
 lib_LTLIBRARIES = libirc.la
 libirc_la_SOURCES = match.c mem.c sock.c server.c irc.c channel.c dns.c
+
+DISTCLEANFILES = config.guess config.sub ltconfig ltmain.sh libtool
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
@@ -375,6 +377,7 @@ clean-generic:
 distclean-generic:
 	-rm -f Makefile $(CONFIG_CLEAN_FILES)
 	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
+	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 mostlyclean-am:  mostlyclean-libLTLIBRARIES mostlyclean-compile \
