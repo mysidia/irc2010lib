@@ -155,12 +155,20 @@ void LibIrcSocketAddEvents(IrcSocket *theSocket)
 		event_del(p);
 	}
 
-	event_set(p, theSocket->fd, EV_READ, IrcLibEventSocket, theSocket);
+	event_set(p, theSocket->fd, EV_READ | EV_TIMEOUT, IrcLibEventSocket, theSocket);
 
 	if ((theSocket->flags & IRCSOCK_WRITE) == 0)
-		event_set(p, theSocket->fd, EV_READ | EV_WRITE, IrcLibEventSocket, theSocket);
+		event_set(p, theSocket->fd, EV_READ | EV_WRITE | EV_TIMEOUT, IrcLibEventSocket, theSocket);
 
-	event_add(p, NULL);
+	if (theSocket->outBuf.firstEls) {
+		theSocket->tv.tv_usec = 10000;
+		theSocket->tv.tv_sec = 0;
+
+		event_add(p, &theSocket->tv);
+	}
+	else
+		event_add(p, NULL);
+
 	theSocket->theEvent = p;
 }
 
@@ -263,6 +271,22 @@ IrcLibEventListener(int fd, short evType, void *vI)
 	LibIrcListenerAddEvents(li);
 }
 
+/**
+ * @brief Send a message
+ */
+void
+IrcSend(IrcSocket *s, const char *fmt, ...)
+{
+	static char buf[IRCBUFSIZE+3];
+	va_list ap;
+
+
+	va_start(ap, fmt);
+	vsnprintf(buf, sizeof(buf), fmt, ap);
+	va_end(ap);
+
+	IrcLibShove(&s->outBuf, buf, strlen(buf));
+}
 
 /**
  * @brief Fired on socket readable event
@@ -271,29 +295,41 @@ void
 IrcLibEventSocket(int fd, short evType, void *p)
 {
 	IrcSocket *q = (IrcSocket *)p;
-
 	char buf[SOCKBUFSIZE];
+	int l;
 
 	if (evType & EV_WRITE)
 		q->flags |= IRCSOCK_WRITE;
 
-	if ((evType & EV_READ) == 0) {
-		LibIrcSocketAddEvents(q);
-		return;
+	if ((evType & EV_READ) != 0) {
+		if (IrcLibReadPackets(q) < 0)
+		{
+	//XXX debug
+			printf("Lost link from %x\n", q->addr.s_addr);
+			close(q->fd);
+			IrcLibdelCon(q);
+			IrcFreeSocket(q);
+			return;
+		}
+	
+		while (IrcLib_pop(&q->inBuf, buf, 0)) {
+			// For now just flush out the buffer
+IrcSend(q, "[%s]\r\n", buf);
+		}
 	}
 
-	if (IrcLibReadPackets(q) < 0)
+	if (evType & EV_TIMEOUT) 
 	{
-//XXX debug
-		printf("Lost link from %x\n", q->addr.s_addr);
-		close(q->fd);
-		IrcLibdelCon(q);
-		IrcFreeSocket(q);
-		return;
-	}
+		while (IrcLib_pop(&q->outBuf, buf, 1)) {
+			if ( send(q->fd, buf, strlen(buf), 0) < 0 ) {
+				q->flags &= ~IRCSOCK_WRITE;
 
-	while (IrcLib_pop(&q->inBuf, buf)) {
-		// For now just flush out the buffer
+////				if (errno != EWOULDBLOCK)
+////					IrcLib_putback(&q->outBuf, buf);
+				break;
+			}
+		}
+		
 	}
 
 	LibIrcSocketAddEvents(q);
@@ -373,6 +409,8 @@ char *IrcLibShove(IrcBuf *t, char *textIn, size_t textLen)
 
 	for(p = text; p < (textIn + textLen); p++) {
 		if (*p == '\n' || (*p == '\r' && p[1] == '\n')) {
+			if (*p == '\r')
+				p++;
 			text = qPush(t, text, p);
 		}
 	}
@@ -391,7 +429,7 @@ char *IrcLibShove(IrcBuf *t, char *textIn, size_t textLen)
  *        then the text of the next item will
  *        fill cmd, and be removed from the buffer.
  */
-int IrcLib_pop(IrcBuf *t, char cmd[IRCBUFSIZE]) {
+int IrcLib_pop(IrcBuf *t, char cmd[IRCBUFSIZE], int sendcr) {
 	BufQel *f;
 	char *cp;
 
@@ -413,8 +451,19 @@ int IrcLib_pop(IrcBuf *t, char cmd[IRCBUFSIZE]) {
 	if (*cp == '\n' || *cp == '\r')
 		*cp = '\0';
 
-	if ((cp - 1) > cmd && (cp[-1] == '\r' || cp[-1] == '\n'))
-		cp[-1] = '\0';
+	if ((cp - 1) > cmd && (cp[-1] == '\r' || cp[-1] == '\n')) {
+		cp--;
+		*cp = '\0';
+	}
+
+	if (sendcr) {
+		if (*cp != '\0')
+			cp++;
+		while((cp - cmd) >= (IRCBUFSIZE - 3))
+			cp--;
+		*cp = '\r';
+		*cp++ = '\n';
+	}
 
 	free(f->text);
 	free(f);
@@ -442,6 +491,6 @@ void IrcBufMakeEmpty(IrcBuf *t)
 {
 	char cmd[1025];
 
-	while(IrcLib_pop(t, cmd))
+	while(IrcLib_pop(t, cmd, 0))
 		return;
 }

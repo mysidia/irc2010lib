@@ -93,6 +93,7 @@
 #endif
 
 #include <event.h>
+#include <stdarg.h>
 
 int match(const char*, const char*);
 void *oalloc(size_t);
@@ -123,6 +124,7 @@ struct _ircsocket
 	int fd;
 	int flags;
 	struct event *theEvent;
+	struct timeval tv;
 	struct in_addr addr;
 
 	IrcLibSocketBuf inBuf;
@@ -131,6 +133,7 @@ struct _ircsocket
 	char __fd__[INTBITS];
 	char __flags__[INTBITS];
 	char __event__[sizeof(struct event *)];
+	char __tv__[sizeof(struct timeval)];
 	char __addr__[sizeof(struct in_addr)];
 	char __inbuf__[sizeof(IrcLibSocketBuf)];
 	char __outbuf__[sizeof(IrcLibSocketBuf)];
@@ -148,6 +151,11 @@ typedef struct
 	LIST_HEAD(, _ircsocket)	links;
 } IrcListener;
 
+
+struct _irccon
+{
+};
+
 int LibIrcSockNonBlock(int listenDesc);
 IrcSocket *LibIrc_socket_make();
 int LibIrc_socket_bind(IrcSocket *theSocket, int portNum, struct in_addr addr);
@@ -158,12 +166,14 @@ void LibIrcListenerAddEvents(IrcListener *);
 int IrcLibReadPackets(IrcSocket *ptrLink);
 void IrcLibEventListener(int fd, short evType, void *p);
 void IrcLibEventSocket(int fd, short evType, void *p);
+void IrcLibEventFlushSockets(int fd, short evType, void *p);
 char *IrcLibShove(IrcBuf *t, char *textIn, size_t textLen);
-int IrcLib_pop(IrcBuf *t, char cmd[IRCBUFSIZE]);
+int IrcLib_pop(IrcBuf *t, char cmd[IRCBUFSIZE], int);
 int IrcLibBufIsEmpty(IrcBuf *t);
 void IrcBufMakeEmpty(IrcBuf *t);
 
 void LibIrcInit();
 int LibIrcSystemLoop();
+void IrcSend(IrcSocket *, const char *, ...);
 
 #define IrcLibPop IrcLib_pop
