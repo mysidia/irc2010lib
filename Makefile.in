@@ -13,7 +13,7 @@
 
 @SET_MAKE@
 
-# $Id: Makefile.in,v 1.15 2001/11/01 22:38:45 mysidia Exp $
+# $Id: Makefile.in,v 1.16 2001/11/17 00:03:10 mysidia Exp $
 #
 #
 
@@ -157,7 +157,7 @@ distclean-libtool:
 	-rm -f libtool
 $(srcdir)/Makefile.in:  Makefile.am  $(top_srcdir)/configure.in $(ACLOCAL_M4)
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnits  Makefile
+	  $(AUTOMAKE) --gnu  Makefile
 Makefile:  $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) && \
 	  CONFIG_HEADERS= CONFIG_LINKS= \
@@ -302,11 +302,6 @@ distdir = $(PACKAGE)-$(VERSION)
 GZIP_ENV = --best
 
 distdir: $(DISTFILES)
-	@if sed 15q $(srcdir)/NEWS | fgrep -e "$(VERSION)" >/dev/null; \
-	then :; else \
-	  echo "NEWS not updated; not releasing" 1>&2; \
-	  exit 1; \
-	fi
 	-chmod -R a+w $(distdir) >/dev/null 2>&1; rm -rf $(distdir)
 	mkdir $(distdir)
 	@for file in $(DISTFILES); do \

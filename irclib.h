@@ -104,6 +104,8 @@
 
 #include <stdarg.h>
 
+#define IRC_MAXARGS 15
+
 int match(const char*, const char*);
 void *oalloc(size_t);
 char *str_dup(const char *);
@@ -199,7 +201,7 @@ struct IRC(_Message)
 	int numarg;
 	char *prefix;
 	char *command;
-	char *args;
+	char *args[IRC_MAXARGS];
 };
 typedef struct IRC(_Message) IRC(Message);
 

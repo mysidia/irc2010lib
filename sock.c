@@ -31,7 +31,7 @@
 #include "irclib.h"
 #include <stddef.h>
 
-ID("$Id: sock.c,v 1.26 2001/10/31 01:23:19 mysidia Exp $");
+ID("$Id: sock.c,v 1.27 2001/11/17 00:03:10 mysidia Exp $");
 
 void IrcLibEventSocket(int fd, short evType, void *p);
 void IrcLibEventListener(int fd, short evType, void *p);
@@ -657,6 +657,18 @@ IrcLibDefaultSockHandler(IrcSocket *q, char *buf)
 int
 IrcLibDefaultClientHandler(IrcSocket *q, char *buf)
 {
+	if (q->port) {
+		IRC(Message) m;
+		int i;
+
+		IRC(MakeMessage)(&m, buf);
+		IrcSend(q, "[prefix = %s]\r\n", m.prefix);
+		IrcSend(q, "[command = %s]\r\n", m.command);
+
+		for(i = 0; i < m.numarg; i++)
+			IrcSend(q, "[args.%i = %s]\r\n", i, m.args[i]);
+	}
+
 	IrcSend(q, "[%s]\r\n", buf);
 }
 
