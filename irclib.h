@@ -186,6 +186,7 @@ struct _ircsocket
 	int (* conn)(struct _ircsocket*, int);
 
 	LIST_ENTRY(_ircsocket)	socket_list;
+	LIST_HEAD(, ircTimer)	timers;
 };
 
 typedef struct _ircsocket IRC(Socket);

@@ -49,6 +49,7 @@ struct _ircTimer {
 	enum ircTimerCountType	count;	/* Count from or to an interval */
 
 	timer_t			(* getCurrentInterval)(time_t*);
+	LIST_ENTRY(_ircTimer)	timer_lst;
 };
 typedef struct _ircTimer ircTimer;
 
@@ -75,3 +76,4 @@ void ircUpdateTimers(int n);
 ircTimer*	ircMakeTimer (timerCallBack*, struct timeval*);
 void		ircFreeTimer (ircTimer*);
 
+void		deleteGlobalTimers ();

@@ -43,6 +43,9 @@ typedef int timerCallBackSocket (IRC(Socket)*, void *pData);
 */
 
 
+static LIST_HEAD(,ircTimer)	globalTimerList;
+
+
 ircTimer* ircMakeTimer (timerCallBack* cb, struct timeval* tv) {
 	ircTimer* t = oalloc(sizeof(ircTimer));
 
@@ -66,46 +69,61 @@ ircTimer* ircTimerScheduleSession(
 )
 {
 	ircTimer* t = ircMakeTimer(func,&tv);
+
+	LIST_INSERT_HEAD(&(ses->timers), t, timer_lst);
 	return t;
 }
 
-ircTimer* ircTimerScheduleSocket(struct _ircsocket*,
+ircTimer* ircTimerScheduleSocket(struct _ircsocket* sock,
                         struct timeval tv, timerCallBack *func)
 {
 	ircTimer* t = ircMakeTimer(func,&tv);
+
+	LIST_INSERT_HEAD(&(sock->timers), t, timer_lst);
 	return t;
 }
 
 ircTimer* ircTimerScheduleGlobal(struct timeval tv, timerCallBackSocket *func)
 {
 	ircTimer* t = ircMakeTimer(func,&tv);
+
+	LIST_INSERT_HEAD(globalTimerList, t, timer_lst);
 	return t;
 }
 
 void ircDoSessionTimers(struct IrcLibSession* ses)
 {
+// Not done
 }
 
 void ircDoSocketTimers(struct _ircsocket*)
 {
+// Not done
 }
 
 void ircDoTimers()
 {
+// Not done
 }
 
 void ircUpdateSocketTimers(struct _ircsocket*, int n)
 {
+// Not done
 }
 
 void ircUpdateSessionTimers(struct IrcLibSession* ses, int n)
 {
+// Not done
 }
 
 void ircUpdateTimers(int n)
 {
+// Not done
+
 }
 
-
-
+void deleteGlobalTimers ()
+{
+// Not done
+}
 
