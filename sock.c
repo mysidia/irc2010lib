@@ -86,6 +86,13 @@ void IrcLibdelCon(IrcSocket *q)
 
 void IrcLibFreeSocket(IrcSocket *q)
 {
+	struct event *ev = q->theEvent;
+
+	if (ev) {
+		event_del(ev);
+		free(ev);
+	}
+
 	free(q);
 }
 
@@ -142,7 +149,7 @@ void LibIrcSocketAddEvents(IrcSocket *theSocket)
 	int foundRead = 0, foundWrite = 0;
 
 	if (theSocket->theEvent == NULL)
-		p = oalloc(sizeof(struct event));
+		p  = oalloc(sizeof(struct event));
 	else {
 		p = theSocket->theEvent;
 		event_del(p);
@@ -151,7 +158,7 @@ void LibIrcSocketAddEvents(IrcSocket *theSocket)
 	event_set(p, theSocket->fd, EV_READ, IrcLibEventSocket, theSocket);
 
 	if ((theSocket->flags & IRCSOCK_WRITE) == 0)
-		event_set(p, theSocket->fd, EV_READ | EV_WRITE, IrcLibEventSockWrite, theSocket);
+		event_set(p, theSocket->fd, EV_READ | EV_WRITE, IrcLibEventSocket, theSocket);
 
 	event_add(p, NULL);
 	theSocket->theEvent = p;
@@ -266,8 +273,16 @@ IrcLibEventSocket(int fd, short evType, void *p)
 
 	char buf[SOCKBUFSIZE];
 
+	if (evType & EV_WRITE)
+		q->flags |= IRCSOCK_WRITE;
+
+	if ((evType & EV_READ) == 0)
+		return;
+
 	if (IrcLibReadPackets(q) < 0)
 	{
+//XXX debug
+		printf("Lost link from %x\n", q->addr.s_addr);
 		close(q->fd);
 		IrcLibdelCon(q);
 		IrcFreeSocket(q);
