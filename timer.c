@@ -41,3 +41,71 @@ typedef int timerCallBack (void *pData);
 typedef int timerCallBackSocket (IRC(Socket)*, void *pData);
 
 */
+
+
+ircTimer* ircMakeTimer (timerCallBack* cb, struct timeval* tv) {
+	ircTimer* t = oalloc(sizeof(ircTimer));
+
+	t->count = irctCOUNT_TO;
+	t->getCurrentInterval = time;
+	t->func = cb;
+
+	return t;
+}
+
+void ircFreeTimer (ircTimer* z) {
+	free (z);
+	return;
+}
+
+
+ircTimer* ircTimerScheduleSession(
+        struct IrcLibSession* ses,
+        struct timeval tv,
+        timerCallBackSocket *func
+)
+{
+	ircTimer* t = ircMakeTimer(func,&tv);
+	return t;
+}
+
+ircTimer* ircTimerScheduleSocket(struct _ircsocket*,
+                        struct timeval tv, timerCallBack *func)
+{
+	ircTimer* t = ircMakeTimer(func,&tv);
+	return t;
+}
+
+ircTimer* ircTimerScheduleGlobal(struct timeval tv, timerCallBackSocket *func)
+{
+	ircTimer* t = ircMakeTimer(func,&tv);
+	return t;
+}
+
+void ircDoSessionTimers(struct IrcLibSession* ses)
+{
+}
+
+void ircDoSocketTimers(struct _ircsocket*)
+{
+}
+
+void ircDoTimers()
+{
+}
+
+void ircUpdateSocketTimers(struct _ircsocket*, int n)
+{
+}
+
+void ircUpdateSessionTimers(struct IrcLibSession* ses, int n)
+{
+}
+
+void ircUpdateTimers(int n)
+{
+}
+
+
+
+

@@ -174,7 +174,7 @@ struct _ircsocket
 	PRIV_MEM(char*,			tailBuf,	1);
 	PRIV_MEM(IrcLibSocketBuf,	inBuf,		1);
 	PRIV_MEM(IrcLibSocketBuf,	outBuf,		1);
-	PRIV_MEM(struct ircTimer,	timer,		1);
+	PRIV_MEM(struct _ircTimer,	timer,		1);
 
 	IRC(MsgTab)	*parser;
 
