@@ -80,7 +80,7 @@ int socket_bind(Socket *theSocket, int portNum)
 	sa.sin_family = AF_INET;
 
 	reuseAddr = 1;
-	setsockopt(listenDesc, SOL_SOCKET, SO_REUSEADDR, &reuseAddr, sizeof(int));
+	setsockopt(theSocket->fd, SOL_SOCKET, SO_REUSEADDR, &reuseAddr, sizeof(int));
 
 	doNonBlock(theSocket->fd);
 
@@ -103,9 +103,9 @@ Listener *socket_listen(Socket *theSocket)
 	port = oalloc(sizeof(Listener));
 
 	port->sock = theSocket;
+	port->topFd = theSocket->fd;
 
 	return port;
-	// topFd = listenDesc;
 }
 
 void socket_addevents(Socket *theSocket)
@@ -120,7 +120,7 @@ void socket_addevents(Socket *theSocket)
  *          0 on no data yet or data read
  */
 int
-ReadPackets(Socket *ptrLink)
+IrcLibReadPackets(Socket *ptrLink)
 {
 	char sockbuf[8192], *b;
 	int k, kt = 0;
@@ -130,7 +130,7 @@ ReadPackets(Socket *ptrLink)
 	while(k > 0)
 	{
 		kt += k;
-		b = ptrLink->buf.shove(sockbuf, k);
+		b = IrcLibShove(ptrLink, sockbuf, k);
 
 		if (b && *b) {
 			int len;
@@ -138,7 +138,7 @@ ReadPackets(Socket *ptrLink)
 			strcpy(sockbuf, b);
 			len = strlen(b);
 
-			if (len >= IPCBUFSIZE)
+			if (len >= SOCKBUFSIZE)
 				return -1;
 
 			k = read(ptrLink->fd, sockbuf + len, 8192 - len);
@@ -162,7 +162,11 @@ ReadPackets(Socket *ptrLink)
 
 void irclibEventListener(Listener *li)
 {
-	if ((pFd = accept(li->fd, (struct sockaddr *)&sai, &alen)) != -1)
+	Socket *p;
+	struct sockaddr_in sai;
+	int pFd, alen, ipOk;
+
+	if ((pFd = accept(li->sock->fd, (struct sockaddr *)&sai, &alen)) != -1)
 	{
 		ipOk = 1;
 
@@ -171,10 +175,10 @@ void irclibEventListener(Listener *li)
 
 		if (doNonBlock(pFd) != -1 && ipOk) 
 		{
-			if (pFd > topFd)
-				topFd = pFd;
+			if (pFd > li->topFd)
+				li->topFd = pFd;
 			p = (Socket *)oalloc(sizeof(Socket));
-			addCon(li, p);
+			IrcLibaddCon(li, p);
 			p->fd = pFd;
 			p->addr = sai.sin_addr;
 		}
@@ -187,17 +191,17 @@ void irclibEventListener(Listener *li)
 void irclibEventSocketRead(Socket *p)
 {
 
-	char buf[IPCBUFSIZE];
+	char buf[SOCKBUFSIZE];
 
-	if (ReadPackets(p) < 0)
+	if (IrcLibReadPackets(p) < 0)
 	{
 		close(p->fd);
 		delCon(p);
 		freeCon(p);
-		continue;
+		return;
 	}
 
-	while (p->buf.pop(buf)) {
+	while (IrcLibPop(p, buf)) {
 	}
 }
 

@@ -24,6 +24,8 @@
  *
  */
 
+#include "irclib.h"
+
 /*! 
  * \fn void * oalloc (size_t size)
  * \brief Clean and allocate a memory area.
