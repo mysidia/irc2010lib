@@ -177,6 +177,7 @@ void LibIrcListenerAddEvents(IrcListener *thePort)
 
 	event_set(p, thePort->sock->fd, EV_READ, IrcLibEventListener, thePort);
 	event_add(p, NULL);
+	thePort->sock->theEvent = p;
 }
 
 /**
@@ -276,8 +277,10 @@ IrcLibEventSocket(int fd, short evType, void *p)
 	if (evType & EV_WRITE)
 		q->flags |= IRCSOCK_WRITE;
 
-	if ((evType & EV_READ) == 0)
+	if ((evType & EV_READ) == 0) {
+		LibIrcSocketAddEvents(q);
 		return;
+	}
 
 	if (IrcLibReadPackets(q) < 0)
 	{
@@ -439,6 +442,6 @@ void IrcBufMakeEmpty(IrcBuf *t)
 {
 	char cmd[1025];
 
-		while(IrcLib_pop(t, cmd))
-			return;
+	while(IrcLib_pop(t, cmd))
+		return;
 }
