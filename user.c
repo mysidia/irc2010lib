@@ -1,6 +1,6 @@
 /*
  *  User data interface
- *  Copyright C 2004 ***REMOVED***. All Rights Reserved.
+ *  Copyright C 2004 Mysidia. All Rights Reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by

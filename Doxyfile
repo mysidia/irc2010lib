@@ -238,7 +238,7 @@ GENERATE_BUGLIST       = YES
 
 ALIASES                = "sideeffect=\par Side Effects:\n"
 ALIASES                += "sideffect=\par Side Effects:\n"
-ALIASES                += "mysid=\author ***REMOVED***\n"
+ALIASES                += "mysid=\author Mysidia ***REMOVED***\n"
 
 # The MAX_INITIALIZER_LINES tag determines the maximum number of lines 
 # the initial value of a variable or define consist of for it to appear in 
